@@ -111,20 +111,6 @@ test_hmac_sha256 (test::simple& t)
         "hmac-sha256 rfc 4231 test case 7");
 }
 
-std::string
-inspect (std::string const& s)
-{
-    std::string out;
-    out.push_back ('"');
-    for (char c : s)
-        switch (c) {
-        default: out.push_back (c); break;
-        case '\n': out.append ("\\n"); break;
-        }
-    out.push_back ('"');
-    return out;
-}
-
 void
 test_encode_base64 (test::simple& t)
 {
