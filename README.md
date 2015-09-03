@@ -1,7 +1,10 @@
-digest::SHA256, digest::HMAC
-============================
+digest::SHA256, digest::HMAC, pbkdf2-sha256
+======================================
 
-SHA-256 and MD5 classes, and HMAC class template for C++11
+SHA-256 and MD5 classes, and HMAC class template,
+encode\_base64 function, decode\_base64 function,
+pbkdf2\_sha256::encrypt function, and pbkdf2\_sha256::verify function
+for C++11.
 
 SYNOPSIS
 --------
@@ -15,6 +18,35 @@ SYNOPSIS
     std::string hexlower = digest_object.hexdigest ();
     digest::base& digest_object.reset ();
     digest::base& digest_object.finish ();
+
+    #include "mime-base64.hpp"
+    // line wrap 76 columns with '\n'
+    std::string base64 = mime::encode_base64 (std::string const& octets);
+    // line wrap 76 columns with endline
+    std::string base64 = mime::encode_base64 (std::string const& octets,
+        std::string const& endline);
+    std::string b64url = mime::encode_base64url (std::string const& octets);
+    std::string b64crypt = mime::encode_base64crypt (std::string const& octets);
+    bool mime::decode_base64 (std::string const& base64, std::string& octets);
+    bool mime::decode_base64url (std::string const& b64url, std::string& octets);
+    bool mime::decode_base64crypt (std::string const& b64crype, std::string& octets);
+
+    #include "pbkdf2-sha256.hpp"
+    // generate crypt hash with options rounds=6400U, salt_size=16U
+    // the hash format is Python's passlib.hash.pbkdf2.pbkdf2_sha256
+    std::string hash = pbkdf2_sha256::encrypt (std::string const& password);
+    std::string hash = pbkdf2_sha256::encrypt (
+        std::string const& password, std::size_t const rounds);
+    std::string hash = pbkdf2_sha256::encrypt (
+        std::string const& password, std::size_t const rounds,
+        std::size_t const salt_size);
+    std::string hash = pbkdf2_sha256::encrypt (
+        std::string const& password, std::string const& salt);
+    std::string hash = pbkdf2_sha256::encrypt (
+        std::string const& password, std::size_t const rounds,
+        std::string const& salt);
+    bool good = pbkdf2_sha256::verify (
+        std::string const& password, std::string const& hash);
 
 DESCRIPTION
 -----------

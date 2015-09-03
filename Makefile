@@ -1,5 +1,7 @@
 TESTEXEC=test-digest
-OBJECTS=digest-base.o digest-md5.o digest-sha-256.o
+OBJECTS=digest-base.o digest-md5.o digest-sha-256.o \
+	mime-base64.o \
+	pbkdf2-sha256.o
 
 CXX=clang++ -std=c++11
 #CXX=g++ -std=c++11
@@ -15,6 +17,12 @@ digest-md5.o : digest.hpp digest-md5.cpp
 
 digest-sha-256.o : digest.hpp digest-sha-256.cpp
 	$(CXX) $(CXXFLAGS) -c digest-sha-256.cpp
+
+mime-base64.o : mime-base64.hpp mime-base64.cpp
+	$(CXX) $(CXXFLAGS) -c mime-base64.cpp
+
+pbkdf2-sha256.o : pbkdf2-sha256.hpp pbkdf2-sha256.cpp
+	$(CXX) $(CXXFLAGS) -c pbkdf2-sha256.cpp
 
 test : $(TESTEXEC)
 	./$(TESTEXEC)
