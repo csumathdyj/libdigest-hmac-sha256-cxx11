@@ -165,7 +165,10 @@ GMAC EXAMPLE
         std::string secret;
         std::string authtag;
 
-        // 
+        // D. McGrew, J. Viega , ``The Galois/Counter Mode of Operation (GCM)'',
+        //      NIST (2005)
+        // Appendix B AES Test Vectors
+        // Test Case 4
         mime::decode_hex ("feffe9928665731c6d6a8f9467308308", keystr);
         mime::decode_hex (
             "d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a72"
