@@ -1,8 +1,9 @@
+#include <cstdint>
 #include "cipher-aes.hpp"
 
 namespace cipher {
 
-static const uint8_t sbox[256] = {
+static const std::uint8_t sbox[256] = {
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b,
     0xfe, 0xd7, 0xab, 0x76, 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
     0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0, 0xb7, 0xfd, 0x93, 0x26,
@@ -27,7 +28,7 @@ static const uint8_t sbox[256] = {
     0xb0, 0x54, 0xbb, 0x16
 };
 
-static const uint32_t dtbl[256] = {
+static const std::uint32_t dtbl[256] = {
     0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6, 0x0df2f2ff, 0xbd6b6bd6,
     0xb16f6fde, 0x54c5c591, 0x50303060, 0x03010102, 0xa96767ce, 0x7d2b2b56,
     0x19fefee7, 0x62d7d7b5, 0xe6abab4d, 0x9a7676ec, 0x45caca8f, 0x9d82821f,
@@ -73,7 +74,7 @@ static const uint32_t dtbl[256] = {
     0xcbb0b07b, 0xfc5454a8, 0xd6bbbb6d, 0x3a16162c
 };
 
-static const uint8_t isbox[256] = {
+static const std::uint8_t isbox[256] = {
     0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e,
     0x81, 0xf3, 0xd7, 0xfb, 0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
     0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb, 0x54, 0x7b, 0x94, 0x32,
@@ -98,7 +99,7 @@ static const uint8_t isbox[256] = {
     0x55, 0x21, 0x0c, 0x7d
 };
 
-static const uint32_t itbl[256] = {
+static const std::uint32_t itbl[256] = {
     0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a, 0xcb6bab3b, 0xf1459d1f,
     0xab58faac, 0x9303e34b, 0x55fa3020, 0xf66d76ad, 0x9176cc88, 0x254c02f5,
     0xfcd7e54f, 0xd7cb2ac5, 0x80443526, 0x8fa362b5, 0x495ab1de, 0x671bba25,
@@ -163,7 +164,7 @@ static const int lntbl[256] = {
     103,  74, 237, 222, 197,  49, 254,  24,  13,  99, 140, 128, 192, 247, 112,   7
 };
 
-static const uint8_t exptbl[256] = {
+static const std::uint8_t exptbl[256] = {
     0x01, 0x03, 0x05, 0x0f, 0x11, 0x33, 0x55, 0xff, 0x1a, 0x2e, 0x72, 0x96,
     0xa1, 0xf8, 0x13, 0x35, 0x5f, 0xe1, 0x38, 0x48, 0xd8, 0x73, 0x95, 0xa4,
     0xf7, 0x02, 0x06, 0x0a, 0x1e, 0x22, 0x66, 0xaa, 0xe5, 0x34, 0x5c, 0xe4,
@@ -189,17 +190,17 @@ static const uint8_t exptbl[256] = {
 };
 
 static inline
-uint32_t pack32 (uint8_t const c0, uint8_t const c1, uint8_t const c2, uint8_t const c3)
+std::uint32_t pack32 (std::uint8_t const c0, std::uint8_t const c1, std::uint8_t const c2, std::uint8_t const c3)
 {
-    return static_cast<uint32_t> (c0)
-         | (static_cast<uint32_t> (c1) <<  8)
-         | (static_cast<uint32_t> (c2) << 16)
-         | (static_cast<uint32_t> (c3) << 24);
+    return static_cast<std::uint32_t> (c0)
+         | (static_cast<std::uint32_t> (c1) <<  8)
+         | (static_cast<std::uint32_t> (c2) << 16)
+         | (static_cast<std::uint32_t> (c3) << 24);
 }
 
 static inline
 void
-unpack32 (uint8_t& c0, uint8_t& c1, uint8_t& c2, uint8_t& c3, uint32_t const a)
+unpack32 (std::uint8_t& c0, std::uint8_t& c1, std::uint8_t& c2, std::uint8_t& c3, std::uint32_t const a)
 {
     c0 = a & 0xff;
     c1 = (a >>  8) & 0xff;
@@ -208,31 +209,31 @@ unpack32 (uint8_t& c0, uint8_t& c1, uint8_t& c2, uint8_t& c3, uint32_t const a)
 }
 
 static inline
-uint32_t
-rotbyte (uint32_t const x)
+std::uint32_t
+rotbyte (std::uint32_t const x)
 {
     return (x >> 8) | (x << 24);
 }
 
 static inline
-uint32_t
-rotrbyte (uint32_t const x)
+std::uint32_t
+rotrbyte (std::uint32_t const x)
 {
     return (x << 8) | (x >> 24);
 }
 
 static inline
-uint32_t
-subbyte (uint32_t const x, uint8_t const box[])
+std::uint32_t
+subbyte (std::uint32_t const x, std::uint8_t const box[])
 {
-    uint8_t x0, x1, x2, x3;
+    std::uint8_t x0, x1, x2, x3;
     unpack32 (x0, x1, x2, x3, x);
     return pack32 (box[x0], box[x1], box[x2], box[x3]);
 }
 
 static inline
-uint8_t
-mul (uint8_t const a, uint8_t const b)
+std::uint8_t
+mul (std::uint8_t const a, std::uint8_t const b)
 {
     if (a == 0 || b == 0)
         return 0;
@@ -246,10 +247,10 @@ mul (uint8_t const a, uint8_t const b)
 }
 
 static inline
-uint32_t
-inv_mix_column (uint32_t const& a)
+std::uint32_t
+inv_mix_column (std::uint32_t const& a)
 {
-    uint8_t a0, a1, a2, a3;
+    std::uint8_t a0, a1, a2, a3;
     unpack32 (a0, a1, a2, a3, a);
     return pack32 (
         mul (0x0e, a0) ^ mul (0x0b, a1) ^ mul (0x0d, a2) ^ mul (0x09, a3),
@@ -261,7 +262,7 @@ inv_mix_column (uint32_t const& a)
 
 static inline
 void
-key_add32 (uint32_t const *s, uint32_t const *keys, uint32_t *out)
+key_add32 (std::uint32_t const *s, std::uint32_t const *keys, std::uint32_t *out)
 {
     out[0] = keys[0] ^ s[0];
     out[1] = keys[1] ^ s[1];
@@ -271,7 +272,7 @@ key_add32 (uint32_t const *s, uint32_t const *keys, uint32_t *out)
 
 static inline
 void
-key_add8to32 (std::array<uint8_t,16> const& s, uint32_t const *keys, uint32_t *out)
+key_add8to32 (std::array<std::uint8_t,16> const& s, std::uint32_t const *keys, std::uint32_t *out)
 {
     out[0] = keys[0] ^ pack32 (s[ 0], s[ 1], s[ 2], s[ 3]);
     out[1] = keys[1] ^ pack32 (s[ 4], s[ 5], s[ 6], s[ 7]);
@@ -281,7 +282,7 @@ key_add8to32 (std::array<uint8_t,16> const& s, uint32_t const *keys, uint32_t *o
 
 static inline
 void
-key_add32to8(uint32_t const *s, uint32_t const *keys, std::array<uint8_t,16>& out)
+key_add32to8(std::uint32_t const *s, std::uint32_t const *keys, std::array<std::uint8_t,16>& out)
 {
     unpack32 (out[ 0], out[ 1], out[ 2], out[ 3], s[0] ^ keys[0]);
     unpack32 (out[ 4], out[ 5], out[ 6], out[ 7], s[1] ^ keys[1]);
@@ -290,21 +291,21 @@ key_add32to8(uint32_t const *s, uint32_t const *keys, std::array<uint8_t,16>& ou
 }
 
 static inline
-uint32_t
-aes_round (uint32_t& w0, uint32_t& w1, uint32_t& w2, uint32_t& w3, uint32_t const tbl[])
+std::uint32_t
+aes_round (std::uint32_t& w0, std::uint32_t& w1, std::uint32_t& w2, std::uint32_t& w3, std::uint32_t const tbl[])
 {
-    uint32_t const a0 = tbl[ w0 & 0xff];
-    uint32_t const a1 = tbl[(w1 >>  8) & 0xff];
-    uint32_t const a2 = tbl[(w2 >> 16) & 0xff];
-    uint32_t const a3 = tbl[(w3 >> 24) & 0xff];
+    std::uint32_t const a0 = tbl[ w0 & 0xff];
+    std::uint32_t const a1 = tbl[(w1 >>  8) & 0xff];
+    std::uint32_t const a2 = tbl[(w2 >> 16) & 0xff];
+    std::uint32_t const a3 = tbl[(w3 >> 24) & 0xff];
     return a0 ^ rotrbyte (a1 ^ rotrbyte (a2 ^ rotrbyte (a3)));
 }
 
 static inline
-uint32_t
-aes_last (uint32_t& w0, uint32_t& w1, uint32_t& w2, uint32_t& w3, uint8_t const box[])
+std::uint32_t
+aes_last (std::uint32_t& w0, std::uint32_t& w1, std::uint32_t& w2, std::uint32_t& w3, std::uint8_t const box[])
 {
-    uint32_t const a = (w0 & 0x000000ff)
+    std::uint32_t const a = (w0 & 0x000000ff)
                      | (w1 & 0x0000ff00)
                      | (w2 & 0x00ff0000)
                      | (w3 & 0xff000000);
@@ -312,7 +313,7 @@ aes_last (uint32_t& w0, uint32_t& w1, uint32_t& w2, uint32_t& w3, uint8_t const 
 }
 
 void
-aes_type::set_key128 (std::array<uint8_t,16> const& key)
+aes_type::set_key128 (std::array<std::uint8_t,16> const& key)
 {
     enum { NK = 4, NR = 10 };
     for (int i = 0; i < NK; ++i) {
@@ -323,7 +324,7 @@ aes_type::set_key128 (std::array<uint8_t,16> const& key)
 }
 
 void
-aes_type::set_key192 (std::array<uint8_t,24> const& key)
+aes_type::set_key192 (std::array<std::uint8_t,24> const& key)
 {
     enum { NK = 6, NR = 12 };
     for (int i = 0; i < NK; ++i) {
@@ -334,7 +335,7 @@ aes_type::set_key192 (std::array<uint8_t,24> const& key)
 }
 
 void
-aes_type::set_key256 (std::array<uint8_t,32> const& key)
+aes_type::set_key256 (std::array<std::uint8_t,32> const& key)
 {
     enum { NK = 8, NR = 14 };
     for (int i = 0; i < NK; ++i) {
@@ -349,9 +350,9 @@ aes_type::schedule_keys (int const nk, int const nr)
 {
     int lastkey = (BLOCKSIZE / 4) * (nr + 1);
     nrounds = nr;
-    uint32_t rcon = 1U;
+    std::uint32_t rcon = 1U;
     for (int i = nk; i < lastkey; ++i) {
-        uint32_t a = keys[i - 1];
+        std::uint32_t a = keys[i - 1];
         if (i % nk == 0) {
             a = subbyte (rotbyte (a), sbox) ^ rcon;
             rcon = (rcon << 1) ^ ((rcon & 0x80) ? 0x11b : 0);
@@ -371,10 +372,10 @@ aes_type::schedule_keys (int const nk, int const nr)
 }
 
 void
-aes_type::encrypt (std::array<uint8_t,16> const& plain, std::array<uint8_t,16>& secret)
+aes_type::encrypt (std::array<std::uint8_t,16> const& plain, std::array<std::uint8_t,16>& secret)
 {
-    uint32_t w[4];
-    uint32_t t[4];
+    std::uint32_t w[4];
+    std::uint32_t t[4];
 
     key_add8to32(plain, &keys[0], w);
     for (int r = 1; r < nrounds; ++r) {
@@ -392,10 +393,10 @@ aes_type::encrypt (std::array<uint8_t,16> const& plain, std::array<uint8_t,16>& 
 }
 
 void
-aes_type::decrypt (std::array<uint8_t,16> const& secret, std::array<uint8_t,16>& plain)
+aes_type::decrypt (std::array<std::uint8_t,16> const& secret, std::array<std::uint8_t,16>& plain)
 {
-    uint32_t w[4];
-    uint32_t t[4];
+    std::uint32_t w[4];
+    std::uint32_t t[4];
 
     key_add8to32 (secret, &ikeys[4 * nrounds], w);
     for (int r = nrounds - 1; r > 0; --r) {

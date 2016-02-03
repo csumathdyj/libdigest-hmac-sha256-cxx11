@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <string>
 #include <array>
 #include <algorithm>
@@ -124,7 +125,7 @@ main (int argc, char* argv[])
         mime::decode_hex (spec[i].secret, secret);
         mime::decode_hex (spec[i].authtag, authtag);
 
-        std::array<uint8_t,16> key;
+        std::array<std::uint8_t,16> key;
         std::copy (keystr.begin (), keystr.end (), key.begin ());
 
         cipher::gcm_type<cipher::aes_type> gcm;

@@ -37,7 +37,7 @@ encrypt (std::string const& password, std::size_t const rounds, std::size_t cons
     std::string salt;
     std::random_device randev;
     std::mt19937 gen (randev ());
-    std::uniform_int_distribution<uint8_t> dist (0, 255);
+    std::uniform_int_distribution<std::uint8_t> dist (0, 255);
     for (std::size_t i = 0; i < salt_size; ++i)
         salt.push_back (dist (gen));
     return encrypt (password, rounds, salt);
@@ -82,7 +82,7 @@ pbkdf2_sha256 (std::string const& secret, std::string const& salt, std::size_t c
 {
     digest::HMAC<digest::SHA256> prf (secret);
     std::string dk;
-    uint32_t i = 0;
+    std::uint32_t i = 0;
     while (keylen > 0) {
         ++i;
         std::string block_number;

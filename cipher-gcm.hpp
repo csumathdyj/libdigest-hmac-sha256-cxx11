@@ -9,7 +9,7 @@ namespace cipher {
 
 // BlockCipher object must have a member function:
 //
-// void BlockCipher::encrypt (std::array<uint8_t,16>, std::array<uint8_t,16>);
+// void BlockCipher::encrypt (std::array<std::uint8_t,16>, std::array<std::uint8_t,16>);
 //
 template<class BlockCipher>
 class gcm_type {
@@ -173,18 +173,18 @@ private:
 
     // T=GCTR(J[0],S)
     template<class SEQ>
-    void encrypt_counter_mode (std::array<uint8_t,16> counter,
+    void encrypt_counter_mode (std::array<std::uint8_t,16> counter,
         SEQ const& src, SEQ& dst, int const pos, int const n)
     {
         std::array<std::uint8_t,16> pad;
         cipher.encrypt (counter, pad);
         for (int i = 0; i < n; ++i) {
-            dst[pos + i] = static_cast<uint8_t> (src[pos + i]) ^ pad[i];
+            dst[pos + i] = static_cast<std::uint8_t> (src[pos + i]) ^ pad[i];
         }
     }
 
     // J[i] = inc(J[i-1])
-    void increment_counter (std::array<uint8_t,16>& counter)
+    void increment_counter (std::array<std::uint8_t,16>& counter)
     {
         for (int i = 15; i >= 0; --i) {
             if (++counter[i])
