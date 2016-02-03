@@ -81,8 +81,10 @@ To calculate a PBKDF2-HMAC-SHA-256 key derivation code,
 use pbkdf2_sha256 function. Additional password hashing
 functions similar as system crypt (3) function can be used.
 
-To encrypt plain text or decript cipher text with AES-GCM,
+To encrypt plain text or to decrypt cipher text with AES-GCM,
 use cipher::aes\_type class and cipher::gcm\_type class.
+Current Galois/Counter mode implementation can treat
+128 bits blocks only.
 
 They calculate from the sequences of byte-oriented input data
 as a std::string to call add member function repeatedly.
@@ -103,14 +105,14 @@ Bit-oriented data are not available.
 
 The representation of the output vector is octets by digest
 member function. One is lowercase hexdecimals by hexdigest
-member function.
+member function. To get uppercase hexdecimals, use mime-base16
+functions. To get Base 64 text, use mime-base64 functions.
 
-EXAMPLES
---------
+HMAC-SHA-256 EXAMPLE
+------------------
 
     #include "digest.hpp"
     #include <string>
-    #include <iostream>
     
     void
     example_sha256 ()
@@ -142,6 +144,47 @@ EXAMPLES
         digest::HMAC<digest::SHA256> hmac (key);
         std::string got = hmac.add (data).hexdigest ();
         //=> 5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843
+    }
+
+GMAC EXAMPLE
+----------
+
+    #include <string>
+    #include <array>
+    #include <algorithm>
+    #include "cipher-aes.hpp"
+    #include "cipher-gcm.hpp"
+    #include "mime-base16.hpp"
+
+    void
+    exam_gmac () {
+        std::string keystr;
+        std::string plain;
+        std::string nonce;
+        std::string authdata;
+        std::string secret;
+        std::string authtag;
+
+        // 
+        mime::decode_hex ("feffe9928665731c6d6a8f9467308308", keystr);
+        mime::decode_hex (
+            "d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a72"
+            "1c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b39",
+            plain);
+        mime::decode_hex ("cafebabefacedbaddecaf888", nonce);
+        mime::decode_hex ("feedfacedeadbeeffeedfacedeadbeefabaddad2", authdata);
+
+        std::array<uint8_t,16> key;
+        std::copy (keystr.begin (), keystr.end (), key.begin ());
+        cipher::gcm_type<cipher::aes_type> gcm;
+        gcm.set_key128 (key);
+        gcm.set_nonce (nonce);
+        gcm.set_authdata (authdata);
+        gcm.encrypt (plain, secret);
+        gcm.get_authtag (authtag);
+
+        std::string got = mime::encode_hex (authtag);
+        //=> 5bc94fbc3221a5db94fae95ae7121a47
     }
 
 COPYRIGHT AND LICENSE
