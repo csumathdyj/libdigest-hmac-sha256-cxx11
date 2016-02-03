@@ -129,7 +129,7 @@ decode_base64basic (std::string const& str64, std::string& octets, int const *c6
     std::size_t k = 0;
     std::string::const_iterator s = str64.cbegin ();
     while (s < str64.cend () && '=' != *s) {
-        unsigned int ch = *s++;
+        unsigned int ch = static_cast<std::uint8_t> (*s++);
         if (ch > 127 || c64[ch] < 0)
             continue;
         u[k++] = c64[ch];
