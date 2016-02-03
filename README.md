@@ -1,9 +1,12 @@
-digest::SHA256, digest::HMAC, pbkdf2-sha256
-======================================
+SHA-256, HMAC, PBKDF2, AES-GCM
+==========================
 
-SHA-256 and MD5 classes, and HMAC class template,
+SHA-256 and MD5 classes, HMAC class template,
 encode\_base64 function, decode\_base64 function,
-pbkdf2\_sha256::encrypt function, and pbkdf2\_sha256::verify function
+encode\_base16 function, decode\_base16 function,
+pbkdf2\_sha256 function,
+pbkdf2\_sha256::encrypt function, and pbkdf2\_sha256::verify function,
+AES class, and GCM class template
 for C++11.
 
 SYNOPSIS
@@ -48,6 +51,19 @@ SYNOPSIS
     bool good = pbkdf2_sha256::verify (
         std::string const& password, std::string const& hash);
 
+    #include "cipher-aes.hpp"
+    #include "cipher-gcm.hpp"
+    cipher::gcm_type<cipher::aes_type> gcm;
+    gcm.set_key128 (std::array<uint8_t,16> const& key);
+    // NEVER use same nonce for a specific key!
+    gcm.set_nonce (std::string const& nonce);
+    gcm.set_authdata (std::string const& authdata); // optional
+    gcm.encrypt (std::string const& plain, std::string& secret);
+    get_authtag (std::string& authtag);
+    // MUST set authtag before decryption to verify authorization.
+    gcm.set_authtag (std::string const& authtag);
+    bool good = gcm.decrypt (std::string const& secret, std::string& plain);
+
 DESCRIPTION
 -----------
 
@@ -60,6 +76,13 @@ template. Its constructor creates the digest object with
 a key argument as a std::string. It uses the key over the
 object life time. Currently, there is no method changing key
 settings.
+
+To calculate a PBKDF2-HMAC-SHA-256 key derivation code,
+use pbkdf2_sha256 function. Additional password hashing
+functions similar as system crypt (3) function can be used.
+
+To encrypt plain text or decript cipher text with AES-GCM,
+use cipher::aes\_type class and cipher::gcm\_type class.
 
 They calculate from the sequences of byte-oriented input data
 as a std::string to call add member function repeatedly.
@@ -124,8 +147,17 @@ EXAMPLES
 COPYRIGHT AND LICENSE
 ---------------------
 
-Copyright (c) 2015, MIZUTANI Tociyuki  
+Copyright (c) 2016, MIZUTANI Tociyuki  
 All rights reserved.
+
+for cipher-aes.cpp:
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+for otherwise sources:
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

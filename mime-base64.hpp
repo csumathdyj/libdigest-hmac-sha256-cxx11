@@ -1,5 +1,4 @@
-#ifndef MIME_BASE64_HPP
-#define MIME_BASE64_HPP
+#pragma once
 
 #include <string>
 
@@ -21,5 +20,3 @@ bool decode_base64basic (std::string const& str64, std::string& octets,
     int const *c64);
 
 }// namespace mime
-
-#endif

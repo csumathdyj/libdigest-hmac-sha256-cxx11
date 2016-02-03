@@ -1,5 +1,4 @@
-#ifndef PBKDF2_SHA256_HPP
-#define PBKDF2_SHA256_HPP
+#pragma once
 
 #include <string>
 
@@ -16,5 +15,3 @@ bool verify (std::string const& password, std::string const& pubkey);
 void pbkdf2_sha256 (std::string const& secret, std::string const& salt, std::size_t const rounds, std::size_t keylen, std::string& dkout);
 
 }//namespace pbkdf2_sha256
-
-#endif

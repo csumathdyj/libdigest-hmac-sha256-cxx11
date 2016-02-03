@@ -1,6 +1,7 @@
 #include <string>
 #include "digest.hpp"
 #include "mime-base64.hpp"
+#include "mime-base16.hpp"
 #include "pbkdf2-sha256.hpp"
 #include "taptests.hpp"
 
@@ -255,6 +256,154 @@ test_base64_more (test::simple& t)
 }
 
 void
+test_encode_base16 (test::simple& t)
+{
+    static const std::basic_string<uint8_t> xinput {
+        0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb,
+        0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4,
+        0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52,
+        0xb8, 0x55, 0xef, 0x53, 0x7f, 0x25, 0xc8, 0x95, 0xbf, 0xa7,
+        0x82, 0x52, 0x65, 0x29, 0xa9, 0xb6, 0x3d, 0x97, 0xaa, 0x63,
+        0x15, 0x64, 0xd5, 0xd7, 0x89, 0xc2, 0xb7, 0x65, 0x44, 0x8c,
+        0x86, 0x35, 0xfb, 0x6c, 0x75, 0x39, 0x27, 0xfa, 0x0e, 0x85,
+        0xd1, 0x55, 0x56, 0x4e, 0x2e, 0x27, 0x2a, 0x28, 0xd1, 0x80,
+        0x2c, 0xa1, 0x0d, 0xaf, 0x44, 0x96, 0x79, 0x46, 0x97, 0xcf,
+        0x8d, 0xb5, 0x85, 0x6c, 0xb6, 0xc1, 0xb0, 0x34, 0x4c, 0x61,
+        0xd8, 0xdb, 0x38, 0x53, 0x5c, 0xa8, 0xaf, 0xce, 0xaf, 0x0b,
+        0xf1, 0x2b, 0x88, 0x1d, 0xc2, 0x00, 0xc9, 0x83, 0x3d, 0xa7,
+        0x26, 0xe9, 0x37, 0x6c, 0x2e, 0x32, 0xcf, 0xf7};
+    std::string octets (xinput.cbegin (), xinput.cend ());
+
+    static const std::string expected1 =
+        "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4"
+        "649B934CA495991B7852B855EF537F25C895\n"
+        "BFA782526529A9B63D97AA631564D5D789C2B765"
+        "448C8635FB6C753927FA0E85D155564E2E27\n"
+        "2A28D1802CA10DAF4496794697CF8DB5856CB6C1"
+        "B0344C61D8DB38535CA8AFCEAF0BF12B881D\n"
+        "C200C9833DA726E9376C2E32CFF7\n";
+    t.ok (mime::encode_base16 (octets) == expected1, "encode_base16/1");
+
+    static const std::string expected2 =
+        "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4"
+        "649B934CA495991B7852B855EF537F25C895"
+        "BFA782526529A9B63D97AA631564D5D789C2B765"
+        "448C8635FB6C753927FA0E85D155564E2E27"
+        "2A28D1802CA10DAF4496794697CF8DB5856CB6C1"
+        "B0344C61D8DB38535CA8AFCEAF0BF12B881D"
+        "C200C9833DA726E9376C2E32CFF7";
+    t.ok (mime::encode_base16 (octets, "") == expected2, "encode_base16/2");
+
+    static const std::string expected3 =
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
+        "649b934ca495991b7852b855ef537f25c895"
+        "bfa782526529a9b63d97aa631564d5d789c2b765"
+        "448c8635fb6c753927fa0e85d155564e2e27"
+        "2a28d1802ca10daf4496794697cf8db5856cb6c1"
+        "b0344c61d8db38535ca8afceaf0bf12b881d"
+        "c200c9833da726e9376c2e32cff7";
+    t.ok (mime::encode_hex (octets) == expected3, "encode_hex/1");
+
+    static const std::string expected4 =
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
+        "649b934ca495991b7852b855ef537f25c895\n"
+        "bfa782526529a9b63d97aa631564d5d789c2b765"
+        "448c8635fb6c753927fa0e85d155564e2e27\n"
+        "2a28d1802ca10daf4496794697cf8db5856cb6c1"
+        "b0344c61d8db38535ca8afceaf0bf12b881d\n"
+        "c200c9833da726e9376c2e32cff7\n";
+    t.ok (mime::encode_hex (octets, "\n") == expected4, "encode_hex/2");
+
+    octets.clear ();
+    for (std::size_t i = 0; i < 36; ++i)
+        octets.push_back (i + 40);
+    static const std::string expected5 =
+        "28292A2B2C2D2E2F303132333435363738393A3B"
+        "3C3D3E3F404142434445464748494A4B\n";
+    t.ok (mime::encode_base16 (octets) == expected5, "encode_base16/1 72 column");
+
+    for (std::size_t i = 36; i < 38; ++i)
+        octets.push_back (i + 40);
+    static const std::string expected6 =
+        "28292A2B2C2D2E2F303132333435363738393A3B"
+        "3C3D3E3F404142434445464748494A4B4C4D\n";
+    t.ok (mime::encode_base16 (octets) == expected6, "encode_base16/1 76 column");
+
+    for (std::size_t i = 38; i < 40; ++i)
+        octets.push_back (i + 40);
+    static const std::string expected7 =
+        "28292A2B2C2D2E2F303132333435363738393A3B"
+        "3C3D3E3F404142434445464748494A4B4C4D\n"
+        "4E4F\n";
+    t.ok (mime::encode_base16 (octets) == expected7, "encode_base16/1 80 column");
+}
+
+void
+test_decode_base16 (test::simple& t)
+{
+    static const std::basic_string<uint8_t> xinput {
+        0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb,
+        0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4,
+        0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52,
+        0xb8, 0x55, 0xef, 0x53, 0x7f, 0x25, 0xc8, 0x95, 0xbf, 0xa7,
+        0x82, 0x52, 0x65, 0x29, 0xa9, 0xb6, 0x3d, 0x97, 0xaa, 0x63,
+        0x15, 0x64, 0xd5, 0xd7, 0x89, 0xc2, 0xb7, 0x65, 0x44, 0x8c,
+        0x86, 0x35, 0xfb, 0x6c, 0x75, 0x39, 0x27, 0xfa, 0x0e, 0x85,
+        0xd1, 0x55, 0x56, 0x4e, 0x2e, 0x27, 0x2a, 0x28, 0xd1, 0x80,
+        0x2c, 0xa1, 0x0d, 0xaf, 0x44, 0x96, 0x79, 0x46, 0x97, 0xcf,
+        0x8d, 0xb5, 0x85, 0x6c, 0xb6, 0xc1, 0xb0, 0x34, 0x4c, 0x61,
+        0xd8, 0xdb, 0x38, 0x53, 0x5c, 0xa8, 0xaf, 0xce, 0xaf, 0x0b,
+        0xf1, 0x2b, 0x88, 0x1d, 0xc2, 0x00, 0xc9, 0x83, 0x3d, 0xa7,
+        0x26, 0xe9, 0x37, 0x6c, 0x2e, 0x32, 0xcf, 0xf7};
+    std::string expected (xinput.cbegin (), xinput.cend ());
+    std::string got;
+
+    static const std::string b16_1 =
+        "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4"
+        "649B934CA495991B7852B855EF537F25C895\n"
+        "BFA782526529A9B63D97AA631564D5D789C2B765"
+        "448C8635FB6C753927FA0E85D155564E2E27\n"
+        "2A28D1802CA10DAF4496794697CF8DB5856CB6C1"
+        "B0344C61D8DB38535CA8AFCEAF0BF12B881D\n"
+        "C200C9833DA726E9376C2E32CFF7\n";
+    t.ok (mime::decode_base16 (b16_1, got), "decode_base16 wrap");
+    t.ok (got == expected, "decode_base16 wrap got");
+
+    static const std::string b16_2 =
+        "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4"
+        "649B934CA495991B7852B855EF537F25C895"
+        "BFA782526529A9B63D97AA631564D5D789C2B765"
+        "448C8635FB6C753927FA0E85D155564E2E27"
+        "2A28D1802CA10DAF4496794697CF8DB5856CB6C1"
+        "B0344C61D8DB38535CA8AFCEAF0BF12B881D"
+        "C200C9833DA726E9376C2E32CFF7";
+    t.ok (mime::decode_base16 (b16_2, got), "decode_base16");
+    t.ok (got == expected, "decode_base16 got");
+
+    static const std::string b16_3 =
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
+        "649b934ca495991b7852b855ef537f25c895"
+        "bfa782526529a9b63d97aa631564d5d789c2b765"
+        "448c8635fb6c753927fa0e85d155564e2e27"
+        "2a28d1802ca10daf4496794697cf8db5856cb6c1"
+        "b0344c61d8db38535ca8afceaf0bf12b881d"
+        "c200c9833da726e9376c2e32cff7";
+    t.ok (mime::decode_hex (b16_3, got), "decode_hex");
+    t.ok (got == expected, "decode_hex got");
+
+    static const std::string b16_4 =
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
+        "649b934ca495991b7852b855ef537f25c895\n"
+        "bfa782526529a9b63d97aa631564d5d789c2b765"
+        "448c8635fb6c753927fa0e85d155564e2e27\n"
+        "2a28d1802ca10daf4496794697cf8db5856cb6c1"
+        "b0344c61d8db38535ca8afceaf0bf12b881d\n"
+        "c200c9833da726e9376c2e32cff7\n";
+    t.ok (mime::decode_hex (b16_4, got), "decode_hex");
+    t.ok (got == expected, "decode_hex got wrap");
+}
+
+void
 test_pbkdf2_sha256 (test::simple& t)
 {
     // https://pythonhosted.org/passlib/lib/passlib.hash.pbkdf2_digest.html
@@ -278,13 +427,15 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (34);
+    test::simple t (49);
     test_md5 (t);
     test_sha256 (t);
     test_sha256_more (t);
     test_hmac_sha256 (t);
     test_encode_base64 (t);
     test_decode_base64 (t);
+    test_encode_base16 (t);
+    test_decode_base16 (t);
     test_base64_more (t);
     test_pbkdf2_sha256 (t);
     return t.done_testing ();
