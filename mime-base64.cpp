@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <string>
 #include <algorithm>
 #include "mime-base64.hpp"
@@ -93,9 +94,9 @@ encode_base64basic (std::string const& in, std::string const& b64,
     std::string::const_iterator s = in.cbegin ();
     int cols = 0;
     while (s < in.cend ()) {
-        std::size_t const u0 = static_cast<uint8_t> (s[0]);
-        std::size_t const u1 = s + 1 < in.cend () ? static_cast<uint8_t> (s[1]) : 0;
-        std::size_t const u2 = s + 2 < in.cend () ? static_cast<uint8_t> (s[2]) : 0;
+        std::size_t const u0 = static_cast<std::uint8_t> (s[0]);
+        std::size_t const u1 = s + 1 < in.cend () ? static_cast<std::uint8_t> (s[1]) : 0;
+        std::size_t const u2 = s + 2 < in.cend () ? static_cast<std::uint8_t> (s[2]) : 0;
         out.push_back (b64[(u0 >> 2) & 0x3f]);
         out.push_back (b64[((u0 << 4) | (u1 >> 4)) & 0x3f]);
         if (s + 1 < in.cend ())
