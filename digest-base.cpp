@@ -41,6 +41,7 @@ base::add (std::string const& data)
         return *this;
     for (; i + blksize < data.size (); i += blksize) {
         update_sum (s);
+        mbuf.clear ();
         mlen += blksize;
     }
     mbuf.assign (s, data.cend());
