@@ -24,23 +24,24 @@ base::add (std::string const& data)
         return *this;
     std::string::const_iterator s = data.cbegin ();
     std::size_t i = 0;
-    if (mbuf.size () > 0 && mbuf.size () < 64U) {
-        std::size_t n = std::min (data.size (), 64U - mbuf.size ());
+    std::size_t const blksize = blocksize ();
+    if (mbuf.size () > 0 && mbuf.size () < blksize) {
+        std::size_t n = std::min (data.size (), blksize - mbuf.size ());
         mbuf.append (s, s + n);
         s += n;
         i += n;
         mlen += n;
     }
-    if (mbuf.size () == 64U) {
+    if (mbuf.size () == blksize) {
         std::string::const_iterator t = mbuf.cbegin ();
         update_sum (t);
         mbuf.clear ();
     }
     if (s == data.cend())
         return *this;
-    for (; i + 64U < data.size (); i += 64U) {
+    for (; i + blksize < data.size (); i += blksize) {
         update_sum (s);
-        mlen += 64U;
+        mlen += blksize;
     }
     mbuf.assign (s, data.cend());
     mlen += mbuf.size ();
