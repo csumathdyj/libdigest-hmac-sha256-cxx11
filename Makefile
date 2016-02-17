@@ -16,10 +16,10 @@ CXX=clang++ -std=c++11
 #CXX=g++ -std=c++11
 CXXFLAGS=-Wall -O2
 
-PROVE=
-#PROVE=prove
+#PROVE=
+PROVE=prove
 
-all : $(OBJECTS)
+all : $(PROGS)
 
 digest-base.o : digest.hpp digest-base.cpp
 	$(CXX) $(CXXFLAGS) -c digest-base.cpp
