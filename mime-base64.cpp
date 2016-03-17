@@ -55,7 +55,7 @@ decode_base64 (std::string const& str64, std::string& octets)
        -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2,
     };
-    return decode_base64basic (str64, octets, C64);
+    return decode_base64basic (str64, octets, C64, false);
 }
 
 // 5. Base 64 Encoding with URL and Filename Safe Alphabet
@@ -72,7 +72,7 @@ decode_base64url (std::string const& str64, std::string& octets)
        -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2,
     };
-    return decode_base64basic (str64, octets, C64);
+    return decode_base64basic (str64, octets, C64, true);
 }
 
 // (not in RFC) Base64 Encoding for Cipher Text
@@ -89,7 +89,7 @@ decode_base64crypt (std::string const& str64, std::string& octets)
        -2, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -2, -2, -2, -2, -2,
     };
-    return decode_base64basic (str64, octets, C64);
+    return decode_base64basic (str64, octets, C64, true);
 }
 
 // Various Base 64 Encoder
@@ -148,6 +148,9 @@ encode_base64basic (std::string const& in, std::string const& b64,
 //  std::string& octets - output octets decoded.
 //  int const *c64 - Base 64 alphabet codes. Its size must be 128
 //                   value >= 0, white space == -1, illegal == -2
+//  bool const autopadding - if lost any padding characters,
+//                           they are filled automatically.
+//
 // results:
 //  bool - correctness of input base64 text, true or false as function value
 //
@@ -155,10 +158,10 @@ encode_base64basic (std::string const& in, std::string const& b64,
 //
 //  1. the padding character is fixed '='.
 //  2. if exists some padding characters, check correctness on padding size.
-//  3. if lost any padding characters, they are filled automatically.
 //
 bool
-decode_base64basic (std::string const& str64, std::string& octets, int const *c64)
+decode_base64basic (std::string const& str64, std::string& octets,
+    int const *c64, bool const autopadding)
 {
     std::string out;
     unsigned int u[4] = {0, 0, 0, 0};

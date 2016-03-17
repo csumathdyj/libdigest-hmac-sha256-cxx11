@@ -17,6 +17,6 @@ bool decode_base64crypt (std::string const& str64, std::string& octets);
 std::string encode_base64basic (std::string const& in, std::string const& b64,
     int const padding, std::string const& endline, int const width);
 bool decode_base64basic (std::string const& str64, std::string& octets,
-    int const *c64);
+    int const *c64, bool const autopadding);
 
 }// namespace mime
