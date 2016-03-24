@@ -7,26 +7,6 @@
 #include "taptests.hpp"
 
 void
-test_md5 (test::simple& t)
-{
-    digest::MD5 md5;
-    t.ok (md5.hexdigest ()
-        == "d41d8cd98f00b204e9800998ecf8427e", "md5 empty data");
-    t.ok (md5.add ("abc").hexdigest ()
-        == "900150983cd24fb0d6963f7d28e17f72", "md5 a");
-    t.ok (md5.add ("abcdbcdecdefdefgefghfghighijhijkijkl").hexdigest ()
-        == "1abfcd9645d94ffc9f14286a365988d6", "md5 b");
-    t.ok (md5.add ("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
-             .hexdigest ()
-        == "8215ef0796a20bcaaae116d3876c664a", "md5 c");
-
-    digest::base& h = md5;
-    h.add ("abc");
-    t.ok (h.hexdigest ()
-        == "900150983cd24fb0d6963f7d28e17f72", "md5 d");
-}
-
-void
 test_sha256 (test::simple& t)
 {
     digest::SHA256 sha256;
@@ -428,8 +408,7 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (49);
-    test_md5 (t);
+    test::simple t (44);
     test_sha256 (t);
     test_sha256_more (t);
     test_hmac_sha256 (t);

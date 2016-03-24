@@ -26,16 +26,6 @@ protected:
     virtual void last_sum () = 0;
 };
 
-class MD5 : public base {
-public:
-    MD5 () : base () {}
-    std::string digest ();
-protected:
-    void init_sum ();
-    void update_sum (std::string::const_iterator& s);
-    void last_sum ();
-};
-
 class SHA256 : public base {
 public:
     SHA256 () : base () {}

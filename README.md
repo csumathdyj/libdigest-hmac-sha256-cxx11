@@ -1,7 +1,7 @@
 SHA-256, HMAC, PBKDF2, AES-GCM
 ==========================
 
-SHA-256 and MD5 classes, HMAC class template,
+SHA-256 classe, HMAC class template,
 encode\_base64 function, decode\_base64 function,
 encode\_base16 function, decode\_base16 function,
 pbkdf2\_sha256 function,
@@ -14,7 +14,6 @@ SYNOPSIS
 
     #include "digest.hpp"
     digest::SHA256 digest_object;
-    digest::MD5    digest_object;
     digest::HMAC<digest::SHA256> digest_object (std::string const& key);
     digest::base& digest_object.add (std::string const& data);
     std::string octets = digest_object.digest ();
@@ -68,8 +67,6 @@ DESCRIPTION
 -----------
 
 To calculate a SHA-256 message digest, use SHA256 class.
-
-To calculate a MD5 message digest, use MD5 class.
 
 To calculate a HMAC message authentication code, use HMAC class
 template. Its constructor creates the digest object with
