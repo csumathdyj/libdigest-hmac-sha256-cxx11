@@ -1,5 +1,5 @@
 DIGEST_TEST=digest-test
-DIGEST_TESTOBJ=digest-base.o digest-sha-256.o \
+DIGEST_TESTOBJ=digest-base.o digest-sha-256.o digest-sha-512.o \
 	mime-base64.o mime-base16.o \
 	pbkdf2-sha256.o
 
@@ -26,6 +26,9 @@ digest-base.o : digest.hpp digest-base.cpp
 
 digest-sha-256.o : digest.hpp digest-sha-256.cpp
 	$(CXX) $(CXXFLAGS) -c digest-sha-256.cpp
+
+digest-sha-512.o : digest.hpp digest-sha-512.cpp
+	$(CXX) $(CXXFLAGS) -c digest-sha-512.cpp
 
 mime-base64.o : mime-base64.hpp mime-base64.cpp
 	$(CXX) $(CXXFLAGS) -c mime-base64.cpp

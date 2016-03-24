@@ -10,25 +10,25 @@ void
 test_sha256 (test::simple& t)
 {
     digest::SHA256 sha256;
-    t.ok (sha256.add ("").hexdigest ()
-        == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "sha256 empty data");
+    t.ok (sha256.add ("").hexdigest () ==
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha-256 empty data");
 
-    t.ok (sha256.add ("The quick brown fox jumps over the lazy dog.").hexdigest ()
-        == "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
-        "sha256 quick brown...");
+    t.ok (sha256.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
+        "sha-256 quick brown...");
 
     digest::base& h = sha256;
     h.add ("The quick brown fox jumps over the lazy dog.");
-    t.ok (h.hexdigest ()
-        == "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
-        "sha256 c");
+    t.ok (h.hexdigest () ==
+        "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
+        "sha-256 c");
     h.reset ();
     h.add ("The quick brown fox ");
     h.add ("jumps over the lazy dog.");
-    t.ok (h.hexdigest ()
-        == "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
-        "sha256 d");
+    t.ok (h.hexdigest () ==
+        "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
+        "sha-256 d");
 }
 
 void
@@ -54,43 +54,399 @@ test_sha256_more (test::simple& t)
 }
 
 void
-test_hmac_sha256 (test::simple& t)
+test_sha512 (test::simple& t)
 {
-    digest::HMAC<digest::SHA256> hmac1 (
-        "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-        "\x0b\x0b\x0b\x0b");
-    t.ok (hmac1.add ("Hi There").hexdigest ()
-        == "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7",
-        "hmac-sha256 rfc 4231 test case 1");
+    digest::SHA512 sha512;
+    t.ok (sha512.add ("").hexdigest () ==
+        "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce"
+        "47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+        "sha-512 empty data");
 
-    digest::HMAC<digest::SHA256> hmac2 ("Jefe");
-    t.ok (hmac2.add ("what do ya want for nothing?").hexdigest ()
-        == "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843",
-        "hmac-sha256 rfc 4231 test case 2");
+    t.ok (sha512.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890cea77a1bb"
+        "c6c7ed9cf205e67b7f2b8fd4c7dfd3a7a8617e45f3c463d481c7e586c39ac1ed",
+        "sha-512 quick brown...");
 
-    digest::HMAC<digest::SHA256> hmac3 (
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-        "\xaa\xaa\xaa");
-    t.ok (hmac3.add ("Test Using Larger Than Block-Size Key - Hash Key First")
-               .hexdigest ()
-        == "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54",
-        "hmac-sha256 rfc 4231 test case 6");
+    digest::base& h = sha512;
+    h.add ("The quick brown fox jumps over the lazy dog.");
+    t.ok (h.hexdigest () ==
+        "91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890cea77a1bb"
+        "c6c7ed9cf205e67b7f2b8fd4c7dfd3a7a8617e45f3c463d481c7e586c39ac1ed",
+        "sha-512 c");
+    h.reset ();
+    h.add ("The quick brown fox ");
+    h.add ("jumps over the lazy dog.");
+    t.ok (h.hexdigest () ==
+        "91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890cea77a1bb"
+        "c6c7ed9cf205e67b7f2b8fd4c7dfd3a7a8617e45f3c463d481c7e586c39ac1ed",
+        "sha-512 d");
+}
 
-    digest::base& h = hmac3;
-    t.ok (h.add ("This is a test using a larger than block-size ke"
-                 "y and a larger than block-size data. The key nee"
-                 "ds to be hashed before being used by the HMAC al"
-                 "gorithm.")
-               .hexdigest ()
-        == "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2",
-        "hmac-sha256 rfc 4231 test case 7");
+void
+test_sha224 (test::simple& t)
+{
+    digest::SHA224 sha224;
+    t.ok (sha224.add ("").hexdigest () ==
+        "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f",
+        "sha-224 empty data");
+
+    t.ok (sha224.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "619cba8e8e05826e9b8c519c0a5c68f4fb653e8a3d8aa04bb2c8cd4c",
+        "sha-224 quick brown...");
+}
+
+void
+test_sha384 (test::simple& t)
+{
+    digest::SHA384 sha384;
+    t.ok (sha384.add ("").hexdigest () ==
+        "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da"
+        "274edebfe76f65fbd51ad2f14898b95b",
+        "sha-384 empty data");
+
+    t.ok (sha384.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "ed892481d8272ca6df370bf706e4d7bc1b5739fa2177aae6c50e946678718fc6"
+        "7a7af2819a021c2fc34e91bdb63409d7",
+        "sha-384 quick brown...");
+}
+
+void
+test_sha512_224 (test::simple& t)
+{
+    digest::SHA512_224 sha;
+    t.ok (sha.add ("").hexdigest () ==
+        "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921",
+        "sha-512/224 empty data");
+
+    t.ok (sha.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890c",
+        "sha-512/224 quick brown...");
+}
+
+void
+test_sha512_256 (test::simple& t)
+{
+    digest::SHA512_256 sha;
+    t.ok (sha.add ("").hexdigest () ==
+        "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce",
+        "sha-512/256 empty data");
+
+    t.ok (sha.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890cea77a1bb",
+        "sha-512/256 quick brown...");
+}
+
+void
+test_hmac_1 (test::simple& t)
+{
+    std::string const key16 =
+        "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"
+        "0b0b0b0b";
+    std::string const data16 =
+        "4869205468657265";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "896fb1128abbdf196832107cd49df33f"
+        "47b4b1169912ba4f53684b22",
+        "hmac-sha-224 rfc 4231 test case 1");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "b0344c61d8db38535ca8afceaf0bf12b"
+        "881dc200c9833da726e9376c2e32cff7",
+        "hmac-sha-256 rfc 4231 test case 1");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "afd03944d84895626b0825f4ab46907f"
+        "15f9dadbe4101ec682aa034c7cebc59c"
+        "faea9ea9076ede7f4af152e8b2fa9cb6",
+        "hmac-sha-384 rfc 4231 test case 1");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "87aa7cdea5ef619d4ff0b4241a1d6cb0"
+        "2379f4e2ce4ec2787ad0b30545e17cde"
+        "daa833b7d6b8a702038b274eaea3f4e4"
+        "be9d914eeb61f1702e696c203a126854",
+        "hmac-sha-512 rfc 4231 test case 1");
+}
+
+void
+test_hmac_2 (test::simple& t)
+{
+    std::string const key16 =
+        "4a656665";
+    std::string const data16 =
+        "7768617420646f2079612077616e7420"
+        "666f72206e6f7468696e673f";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "a30e01098bc6dbbf45690f3a7e9e6d0f"
+        "8bbea2a39e6148008fd05e44",
+        "hmac-sha-224 rfc 4231 test case 2");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "5bdcc146bf60754e6a042426089575c7"
+        "5a003f089d2739839dec58b964ec3843",
+        "hmac-sha-256 rfc 4231 test case 2");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "af45d2e376484031617f78d2b58a6b1b"
+        "9c7ef464f5a01b47e42ec3736322445e"
+        "8e2240ca5e69e2c78b3239ecfab21649",
+        "hmac-sha-384 rfc 4231 test case 2");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "164b7a7bfcf819e2e395fbe73b56e0a3"
+        "87bd64222e831fd610270cd7ea250554"
+        "9758bf75c05a994a6d034f65f8f0e6fd"
+        "caeab1a34d4a6b4b636e070a38bce737",
+        "hmac-sha-512 rfc 4231 test case 2");
+}
+
+void
+test_hmac_3 (test::simple& t)
+{
+    std::string const key16 =
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaa";
+    std::string const data16 =
+        "dddddddddddddddddddddddddddddddd"
+        "dddddddddddddddddddddddddddddddd"
+        "dddddddddddddddddddddddddddddddd"
+        "dddd";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "7fb3cb3588c6c1f6ffa9694d7d6ad264"
+        "9365b0c1f65d69d1ec8333ea",
+        "hmac-sha-224 rfc 4231 test case 3");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "773ea91e36800e46854db8ebd09181a7"
+        "2959098b3ef8c122d9635514ced565fe",
+        "hmac-sha-256 rfc 4231 test case 3");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "88062608d3e6ad8a0aa2ace014c8a86f"
+        "0aa635d947ac9febe83ef4e55966144b"
+        "2a5ab39dc13814b94e3ab6e101a34f27",
+        "hmac-sha-384 rfc 4231 test case 3");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "fa73b0089d56a284efb0f0756c890be9"
+        "b1b5dbdd8ee81a3655f83e33b2279d39"
+        "bf3e848279a722c806b485a47e67c807"
+        "b946a337bee8942674278859e13292fb",
+        "hmac-sha-512 rfc 4231 test case 3");
+}
+
+void
+test_hmac_4 (test::simple& t)
+{
+    std::string const key16 =
+        "0102030405060708090a0b0c0d0e0f10"
+        "111213141516171819";
+    std::string const data16 =
+        "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        "cdcd";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "6c11506874013cac6a2abc1bb382627c"
+        "ec6a90d86efc012de7afec5a",
+        "hmac-sha-224 rfc 4231 test case 4");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "82558a389a443c0ea4cc819899f2083a"
+        "85f0faa3e578f8077a2e3ff46729665b",
+        "hmac-sha-256 rfc 4231 test case 4");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "3e8a69b7783c25851933ab6290af6ca7"
+        "7a9981480850009cc5577c6e1f573b4e"
+        "6801dd23c4a7d679ccf8a386c674cffb",
+        "hmac-sha-384 rfc 4231 test case 4");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "b0ba465637458c6990e5a8c5f61d4af7"
+        "e576d97ff94b872de76f8050361ee3db"
+        "a91ca5c11aa25eb4d679275cc5788063"
+        "a5f19741120c4f2de2adebeb10a298dd",
+        "hmac-sha-512 rfc 4231 test case 4");
+}
+
+void
+test_hmac_5 (test::simple& t)
+{
+    std::string const key16 =
+        "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c"
+        "0c0c0c0c";
+    std::string const data16 =
+        "546573742057697468205472756e6361"
+        "74696f6e";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest ().substr (0, 128 / 4) ==
+        "0e2aea68a90c8d37c988bcdb9fca6fa8",
+        "hmac-sha-224 rfc 4231 test case 5");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest ().substr (0, 128 / 4) ==
+        "a3b6167473100ee06e0c796c2955552b",
+        "hmac-sha-256 rfc 4231 test case 5");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest ().substr (0, 128 / 4) ==
+        "3abf34c3503b2a23a46efc619baef897",
+        "hmac-sha-384 rfc 4231 test case 5");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest ().substr (0, 128 / 4) ==
+        "415fad6271580a531d4179bc891d87a6",
+        "hmac-sha-512 rfc 4231 test case 5");
+}
+
+void
+test_hmac_6 (test::simple& t)
+{
+    std::string const key16 =
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaa";
+    std::string const data16 =
+        "54657374205573696e67204c61726765"
+        "72205468616e20426c6f636b2d53697a"
+        "65204b6579202d2048617368204b6579"
+        "204669727374";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "95e9a0db962095adaebe9b2d6f0dbce2"
+        "d499f112f2d2b7273fa6870e",
+        "hmac-sha-224 rfc 4231 test case 6");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "60e431591ee0b67f0d8a26aacbf5b77f"
+        "8e0bc6213728c5140546040f0ee37f54",
+        "hmac-sha-256 rfc 4231 test case 6");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "4ece084485813e9088d2c63a041bc5b4"
+        "4f9ef1012a2b588f3cd11f05033ac4c6"
+        "0c2ef6ab4030fe8296248df163f44952",
+        "hmac-sha-384 rfc 4231 test case 6");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "80b24263c7c1a3ebb71493c1dd7be8b4"
+        "9b46d1f41b4aeec1121b013783f8f352"
+        "6b56d037e05f2598bd0fd2215d6a1e52"
+        "95e64f73f63f0aec8b915a985d786598",
+        "hmac-sha-512 rfc 4231 test case 6");
+}
+
+void
+test_hmac_7 (test::simple& t)
+{
+    std::string const key16 =
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        "aaaaaa";
+    std::string const data16 =
+        "54686973206973206120746573742075"
+        "73696e672061206c6172676572207468"
+        "616e20626c6f636b2d73697a65206b65"
+        "7920616e642061206c61726765722074"
+        "68616e20626c6f636b2d73697a652064"
+        "6174612e20546865206b6579206e6565"
+        "647320746f2062652068617368656420"
+        "6265666f7265206265696e6720757365"
+        "642062792074686520484d414320616c"
+        "676f726974686d2e";
+
+    std::string key, data;
+    mime::decode_hex (key16, key);
+    mime::decode_hex (data16, data);
+
+    digest::HMAC<digest::SHA224> hmac_sha_224 (key);
+    t.ok (hmac_sha_224.add (data).hexdigest () ==
+        "3a854166ac5d9f023f54d517d0b39dbd"
+        "946770db9c2b95c9f6f565d1",
+        "hmac-sha-224 rfc 4231 test case 7");
+
+    digest::HMAC<digest::SHA256> hmac_sha_256 (key);
+    t.ok (hmac_sha_256.add (data).hexdigest () ==
+        "9b09ffa71b942fcb27635fbcd5b0e944"
+        "bfdc63644f0713938a7f51535c3a35e2",
+        "hmac-sha-256 rfc 4231 test case 7");
+
+    digest::HMAC<digest::SHA384> hmac_sha_384 (key);
+    t.ok (hmac_sha_384.add (data).hexdigest () ==
+        "6617178e941f020d351e2f254e8fd32c"
+        "602420feb0b8fb9adccebb82461e99c5"
+        "a678cc31e799176d3860e6110c46523e",
+        "hmac-sha-384 rfc 4231 test case 7");
+
+    digest::HMAC<digest::SHA512> hmac_sha_512 (key);
+    t.ok (hmac_sha_512.add (data).hexdigest () ==
+        "e37b6a775dc87dbaa4dfa9f96e5e3ffd"
+        "debd71f8867289865df5a32d20cdc944"
+        "b6022cac3c4982b10d5eeb55c3e4de15"
+        "134676fb6de0446065c97440fa8c6a58",
+        "hmac-sha-512 rfc 4231 test case 7");
 }
 
 void
@@ -408,10 +764,21 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (44);
+    test::simple t (80);
     test_sha256 (t);
     test_sha256_more (t);
-    test_hmac_sha256 (t);
+    test_sha512 (t);
+    test_sha224 (t);
+    test_sha384 (t);
+    test_sha512_224 (t);
+    test_sha512_256 (t);
+    test_hmac_1 (t);
+    test_hmac_2 (t);
+    test_hmac_3 (t);
+    test_hmac_4 (t);
+    test_hmac_5 (t);
+    test_hmac_6 (t);
+    test_hmac_7 (t);
     test_encode_base64 (t);
     test_decode_base64 (t);
     test_encode_base16 (t);

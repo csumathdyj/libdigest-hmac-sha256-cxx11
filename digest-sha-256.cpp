@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "digest.hpp"
 
+// SHA-256 and SHA-224 implementation
+
 namespace digest {
 
 static inline void
@@ -63,6 +65,14 @@ SHA256::init_sum ()
     sum[6] = 0x1f83d9ab; sum[7] = 0x5be0cd19;
 }
 
+void
+SHA224::init_sum ()
+{
+    sum[0] = 0xc1059ed8; sum[1] = 0x367cd507; sum[2] = 0x3070dd17;
+    sum[3] = 0xf70e5939; sum[4] = 0xffc00b31; sum[5] = 0x68581511;
+    sum[6] = 0x64f98fa7; sum[7] = 0xbefa4fa4;
+}
+
 static inline void
 round (
     std::uint32_t const a, std::uint32_t const b, std::uint32_t const c,
@@ -78,7 +88,7 @@ round (
 }
 
 void
-SHA256::update_sum (std::string::const_iterator& s)
+SHA2_32BIT::update_sum (std::string::const_iterator& s)
 {
     static const std::uint32_t K[64] = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
@@ -123,7 +133,7 @@ SHA256::update_sum (std::string::const_iterator& s)
 }
 
 void
-SHA256::last_sum ()
+SHA2_32BIT::last_sum ()
 {
     mbuf.push_back (0x80);
     std::size_t n = (mbuf.size () + 8U + 64U - 1U) / 64U * 64U;
@@ -139,6 +149,17 @@ std::string
 SHA256::digest ()
 {
     std::string octets (32, 0);
+    finish ();
+    std::uint32_t *p = sum;
+    for (std::size_t i = 0; i < octets.size (); i += 4)
+        unpack_big_endian (octets, i, *p++);
+    return octets;
+}
+
+std::string
+SHA224::digest ()
+{
+    std::string octets (28, 0);
     finish ();
     std::uint32_t *p = sum;
     for (std::size_t i = 0; i < octets.size (); i += 4)
