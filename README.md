@@ -67,7 +67,17 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
+To calculate a SHA-224 message digest, use SHA224 class.
+
 To calculate a SHA-256 message digest, use SHA256 class.
+
+To calculate a SHA-384 message digest, use SHA384 class.
+
+To calculate a SHA-512 message digest, use SHA512 class.
+
+To calculate a SHA-512/224 message digest, use SHA512_224 class.
+
+To calculate a SHA-512/256 message digest, use SHA512_256 class.
 
 To calculate a HMAC message authentication code, use HMAC class
 template. Its constructor creates the digest object with
@@ -106,8 +116,8 @@ member function. One is lowercase hexdecimals by hexdigest
 member function. To get uppercase hexdecimals, use mime-base16
 functions. To get Base 64 text, use mime-base64 functions.
 
-HMAC-SHA-256 EXAMPLE
-------------------
+SHA-256 AND HMAC-SHA-256 EXAMPLE
+----------------------------
 
     #include "digest.hpp"
     #include <string>
