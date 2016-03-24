@@ -137,6 +137,19 @@ test_sha512_256 (test::simple& t)
 }
 
 void
+test_sha1 (test::simple& t)
+{
+    digest::SHA1 sha;
+    t.ok (sha.add ("").hexdigest () ==
+        "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "sha-1 empty data");
+
+    t.ok (sha.add ("The quick brown fox jumps over the lazy dog.").hexdigest () ==
+        "408d94384216f890ff7a0c3528e8bed1e0b01621",
+        "sha-1 quick brown...");
+}
+
+void
 test_hmac_1 (test::simple& t)
 {
     std::string const key16 =
@@ -447,6 +460,61 @@ test_hmac_7 (test::simple& t)
         "b6022cac3c4982b10d5eeb55c3e4de15"
         "134676fb6de0446065c97440fa8c6a58",
         "hmac-sha-512 rfc 4231 test case 7");
+}
+
+// RFC 6238 TOTP: Time-Based One-Time Password Algorithm
+static std::uint32_t
+totp (digest::base& hfunc, std::string const& secret, std::uint64_t const epoch)
+{
+    std::uint64_t const t = epoch / 30U;
+    std::string data (8, 0);
+    for (int i = 0; i < 8; ++i) {
+        data[i] = (t >> (56 - (i * 8))) & 0xff;
+    }
+    std::string const hs = hfunc.add (data).digest ();
+    int off = static_cast<std::uint8_t> (hs[hs.size () - 1]) & 0x0f;
+    std::uint32_t bin = (static_cast<std::uint8_t> (hs[off + 0]) << 24)
+                       | (static_cast<std::uint8_t> (hs[off + 1]) << 16)
+                       | (static_cast<std::uint8_t> (hs[off + 2]) <<  8)
+                       |  static_cast<std::uint8_t> (hs[off + 3]);
+    return (bin & 0x7fffffff) % 100000000U;
+}
+
+// RFC 6238 TOTP, Appendix B. Test Vectors
+void
+test_rfc6238_totp (test::simple& t)
+{
+    std::string const secret1 = "12345678901234567890";
+    std::string const secret2 = "12345678901234567890123456789012";
+    std::string const secret5 = "12345678901234567890123456789012"
+                                 "34567890123456789012345678901234";
+    digest::HMAC<digest::SHA1>   hf1 (secret1);
+    digest::HMAC<digest::SHA256> hf2 (secret2);
+    digest::HMAC<digest::SHA512> hf5 (secret5);
+
+    t.ok (totp (hf1, secret1,          59ULL) == 94287082, "totp SHA-1 59");
+    t.ok (totp (hf2, secret2,          59ULL) == 46119246, "totp SHA-256 59");
+    t.ok (totp (hf5, secret5,          59ULL) == 90693936, "totp SHA-512 59");
+
+    t.ok (totp (hf1, secret1,  1111111109ULL) ==  7081804, "totp SHA-1 1111111109");
+    t.ok (totp (hf2, secret2,  1111111109ULL) == 68084774, "totp SHA-256 1111111109");
+    t.ok (totp (hf5, secret5,  1111111109ULL) == 25091201, "totp SHA-512 1111111109");
+
+    t.ok (totp (hf1, secret1,  1111111111ULL) == 14050471, "totp SHA-1 1111111111");
+    t.ok (totp (hf2, secret2,  1111111111ULL) == 67062674, "totp SHA-256 1111111111");
+    t.ok (totp (hf5, secret5,  1111111111ULL) == 99943326, "totp SHA-512 1111111111");
+
+    t.ok (totp (hf1, secret1,  1234567890ULL) == 89005924, "totp SHA-1 1234567890");
+    t.ok (totp (hf2, secret2,  1234567890ULL) == 91819424, "totp SHA-256 1234567890");
+    t.ok (totp (hf5, secret5,  1234567890ULL) == 93441116, "totp SHA-512 1234567890");
+
+    t.ok (totp (hf1, secret1,  2000000000ULL) == 69279037, "totp SHA-1 2000000000");
+    t.ok (totp (hf2, secret2,  2000000000ULL) == 90698825, "totp SHA-256 2000000000");
+    t.ok (totp (hf5, secret5,  2000000000ULL) == 38618901, "totp SHA-512 2000000000");
+
+    t.ok (totp (hf1, secret1, 20000000000ULL) == 65353130, "totp SHA-1 20000000000");
+    t.ok (totp (hf2, secret2, 20000000000ULL) == 77737706, "totp SHA-256 20000000000");
+    t.ok (totp (hf5, secret5, 20000000000ULL) == 47863826, "totp SHA-512 20000000000");
 }
 
 void
@@ -764,7 +832,7 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (80);
+    test::simple t (100);
     test_sha256 (t);
     test_sha256_more (t);
     test_sha512 (t);
@@ -772,6 +840,7 @@ main ()
     test_sha384 (t);
     test_sha512_224 (t);
     test_sha512_256 (t);
+    test_sha1 (t);
     test_hmac_1 (t);
     test_hmac_2 (t);
     test_hmac_3 (t);
@@ -779,6 +848,7 @@ main ()
     test_hmac_5 (t);
     test_hmac_6 (t);
     test_hmac_7 (t);
+    test_rfc6238_totp (t);
     test_encode_base64 (t);
     test_decode_base64 (t);
     test_encode_base16 (t);

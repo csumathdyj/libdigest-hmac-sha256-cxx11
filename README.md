@@ -1,7 +1,7 @@
 SHA-2, HMAC, PBKDF2, AES-GCM
 ==========================
 
-SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, SHA-512/256 classes,
+SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, SHA-512/256 classes,
 HMAC class template,
 encode\_base64 function, decode\_base64 function,
 encode\_base16 function, decode\_base16 function,
@@ -66,6 +66,8 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
+
+To calculate a SHA-1 message digest, use SHA1 class.
 
 To calculate a SHA-224 message digest, use SHA224 class.
 

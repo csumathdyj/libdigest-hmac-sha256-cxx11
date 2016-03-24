@@ -47,6 +47,17 @@ protected:
     void last_sum ();
 };
 
+class SHA1 : public SHA2_32BIT {
+protected:
+    std::uint32_t sum[5];
+public:
+    SHA1 () : SHA2_32BIT () {}
+    std::string digest ();
+protected:
+    void init_sum ();
+    void update_sum (std::string::const_iterator& s);
+};
+
 class SHA224 : public SHA2_32BIT {
 public:
     SHA224 () : SHA2_32BIT () {}
