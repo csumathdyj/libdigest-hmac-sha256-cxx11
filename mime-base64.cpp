@@ -111,22 +111,24 @@ encode_base64basic (std::string const& in, std::string const& b64,
 {
     std::string out;
     std::string::const_iterator s = in.cbegin ();
+    std::string::const_iterator const e = in.cend ();
     int cols = 0;
-    while (s < in.cend ()) {
-        std::size_t const u0 = static_cast<std::uint8_t> (s[0]);
-        std::size_t const u1 = s + 1 < in.cend () ? static_cast<std::uint8_t> (s[1]) : 0;
-        std::size_t const u2 = s + 2 < in.cend () ? static_cast<std::uint8_t> (s[2]) : 0;
-        out.push_back (b64[(u0 >> 2) & 0x3f]);
-        out.push_back (b64[((u0 << 4) | (u1 >> 4)) & 0x3f]);
-        if (s + 1 < in.cend ())
-            out.push_back (b64[((u1 << 2) | (u2 >> 6)) & 0x3f]);
-        else if (padding)
-            out.push_back (padding);
-        if (s + 2 < in.cend ())
-            out.push_back (b64[u2 & 0x3f]);
-        else if (padding)
-            out.push_back (padding);
-        s = s + 2 < in.cend () ? s + 3 : in.cend ();
+    for (; s < e; s += 3) {
+        int const d = e - s;
+        int const n = d > 2 ? 4 : 1 == d ? 2 : 3;
+        std::uint32_t u = static_cast<std::uint8_t> (s[0]);
+        std::uint32_t const u1 = d > 1 ? static_cast<std::uint8_t> (s[1]) : 0;
+        std::uint32_t const u2 = d > 2 ? static_cast<std::uint8_t> (s[2]) : 0;
+        u = (u << 16) | (u1 << 8) | u2;
+        for (int i = 0; i < n; ++i) {
+            u = (u << 6) | (u >> 18);
+            out.push_back (b64[u & 0x3f]);
+        }
+        if (padding && n < 4) {
+            for (int i = 0; i < 4 - n; ++i) {
+                out.push_back (padding);
+            }
+        }
         if (width > 0) {
             cols += 4;
             if (cols >= width) {
@@ -164,7 +166,7 @@ decode_base64basic (std::string const& str64, std::string& octets,
     int const *c64, bool const autopadding)
 {
     std::string out;
-    unsigned int u[4] = {0, 0, 0, 0};
+    std::uint32_t u = 0;
     std::size_t k = 0;
     std::string::const_iterator s = str64.cbegin ();
     while (s < str64.cend () && '=' != *s) {
@@ -173,13 +175,13 @@ decode_base64basic (std::string const& str64, std::string& octets,
             return false;
         if (c64[ch] < 0)
             continue;
-        u[k++] = c64[ch];
-        if (k >= 4) {
-            out.push_back ((u[0] << 2) | (u[1] >> 4));
-            out.push_back (((u[1] & 0x0f) << 4) | (u[2] >> 2));
-            out.push_back (((u[2] & 0x03) << 6) | u[3]);
+        u |= static_cast<std::uint32_t> (c64[ch]) << ((3 - k) * 6);
+        if (++k > 3) {
+            out.push_back ((u >> 16) & 0xff);
+            out.push_back ((u >>  8) & 0xff);
+            out.push_back ( u        & 0xff);
             k = 0;
-            u[0] = u[1] = u[2] = u[3] = 0;
+            u = 0;
         }
     }
     std::size_t npadding = 0;
@@ -192,9 +194,9 @@ decode_base64basic (std::string const& str64, std::string& octets,
         return false;
     npadding = 4 - k;
     if (1 == npadding || 2 == npadding)
-        out.push_back ((u[0] << 2) | (u[1] >> 4));
+        out.push_back ((u >> 16) & 0xff);
     if (1 == npadding)
-        out.push_back (((u[1] & 0x0f) << 4) | (u[2] >> 2));
+        out.push_back ((u >>  8) & 0xff);
     std::swap (octets, out);
     return true;
 }
