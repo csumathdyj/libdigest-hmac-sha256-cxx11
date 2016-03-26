@@ -8,32 +8,18 @@ namespace mime {
 
 // 8. Base 16 Encoding: uppercase
 std::string
-encode_base16 (std::string const& in)
+encode_base16 (std::string const& in, std::string const& endline, int const width)
 {
     static const std::string B16 = "0123456789ABCDEF";
-    return encode_base16basic (in, B16, "\n", 76);
-}
-
-std::string
-encode_base16 (std::string const& in, std::string const& endline)
-{
-    static const std::string B16 = "0123456789ABCDEF";
-    return encode_base16basic (in, B16, endline, 76);
+    return encode_base16basic (in, B16, endline, width);
 }
 
 // (not in RFC) HEX Encoding for Cipher/Digest Text: lowercase
 std::string
-encode_hex (std::string const& in)
+encode_hex (std::string const& in, std::string const& endline, int const width)
 {
     static const std::string B16 = "0123456789abcdef";
-    return encode_base16basic (in, B16, "", 76);
-}
-
-std::string
-encode_hex (std::string const& in, std::string const& endline)
-{
-    static const std::string B16 = "0123456789abcdef";
-    return encode_base16basic (in, B16, endline, 76);
+    return encode_base16basic (in, B16, endline, width);
 }
 
 // 8. Base 16 Encoding: both uppercase and lowercase

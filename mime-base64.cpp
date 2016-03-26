@@ -8,19 +8,11 @@ namespace mime {
 
 // 4. Base 64 Encoding
 std::string
-encode_base64 (std::string const& in)
+encode_base64 (std::string const& in, std::string const& endline, int const width)
 {
     static const std::string B64
         = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    return encode_base64basic (in, B64, '=', "\n", 76);
-}
-
-std::string
-encode_base64 (std::string const& in, std::string const& endline)
-{
-    static const std::string B64
-        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    return encode_base64basic (in, B64, '=', endline, 76);
+    return encode_base64basic (in, B64, '=', endline, width);
 }
 
 // 5. Base 64 Encoding with URL and Filename Safe Alphabet

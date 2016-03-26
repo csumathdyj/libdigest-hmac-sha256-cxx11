@@ -6,8 +6,8 @@ namespace mime {
 
 // RFC 4648 <http://tools.ietf.org/html/rfc4648>
 
-std::string encode_base64 (std::string const& in);
-std::string encode_base64 (std::string const& in, std::string const& endline);
+std::string encode_base64 (std::string const& in,
+    std::string const& endline = "\n", int const width = 76);
 std::string encode_base64url (std::string const& in);
 std::string encode_base64crypt (std::string const& in);
 bool decode_base64 (std::string const& str64, std::string& octets);
