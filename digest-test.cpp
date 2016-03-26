@@ -2,6 +2,7 @@
 #include <string>
 #include "digest.hpp"
 #include "mime-base64.hpp"
+#include "mime-base32.hpp"
 #include "mime-base16.hpp"
 #include "pbkdf2-sha256.hpp"
 #include "taptests.hpp"
@@ -530,6 +531,72 @@ test_encode_base64_foobar (test::simple& t)
 }
 
 void
+test_encode_base32_foobar (test::simple& t)
+{
+    t.ok (mime::encode_base32 ("", "") == "", "base32 empty");
+    t.ok (mime::encode_base32 ("f", "") == "MY======", "base32 f");
+    t.ok (mime::encode_base32 ("fo", "") == "MZXQ====", "base32 fo");
+    t.ok (mime::encode_base32 ("foo", "") == "MZXW6===", "base32 foo");
+    t.ok (mime::encode_base32 ("foob", "") == "MZXW6YQ=", "base32 foob");
+    t.ok (mime::encode_base32 ("fooba", "") == "MZXW6YTB", "base32 fooba");
+    t.ok (mime::encode_base32 ("foobar", "") == "MZXW6YTBOI======", "base32 foobar");
+    t.ok (mime::encode_base32hex ("", "") == "", "base32 empty");
+    t.ok (mime::encode_base32hex ("f", "") == "CO======", "base32hex f");
+    t.ok (mime::encode_base32hex ("fo", "") == "CPNG====", "base32hex fo");
+    t.ok (mime::encode_base32hex ("foo", "") == "CPNMU===", "base32hex foo");
+    t.ok (mime::encode_base32hex ("foob", "") == "CPNMUOG=", "base32hex foob");
+    t.ok (mime::encode_base32hex ("fooba", "") == "CPNMUOJ1", "base32hex fooba");
+    t.ok (mime::encode_base32hex ("foobar", "") == "CPNMUOJ1E8======", "base32hex foobar");
+}
+
+void
+test_decode_base32_foobar (test::simple& t)
+{
+    std::string got;
+    t.ok (mime::decode_base32 ("", got), "decode_base32 empty");
+    t.ok (got == "", "decode_base32 got empty");
+
+    t.ok (mime::decode_base32 ("MY======", got), "decode_base32 MY======");
+    t.ok (got == "f", "decode_base32 got f");
+
+    t.ok (mime::decode_base32 ("MZXQ====", got), "decode_base32 MZXQ====");
+    t.ok (got == "fo", "decode_base32 got fo");
+
+    t.ok (mime::decode_base32 ("MZXW6===", got), "decode_base32 MZXW6===");
+    t.ok (got == "foo", "decode_base32 got foo");
+
+    t.ok (mime::decode_base32 ("MZXW6YQ=", got), "decode_base32 MZXW6YQ=");
+    t.ok (got == "foob", "decode_base32 got foob");
+
+    t.ok (mime::decode_base32 ("MZXW6YTB", got), "decode_base32 MZXW6YTB");
+    t.ok (got == "fooba", "decode_base32 got fooba");
+
+    t.ok (mime::decode_base32 ("MZXW6YTBOI======", got), "decode_base32 MZXW6YTBOI======");
+    t.ok (got == "foobar", "decode_base32 got foobar");
+
+    t.ok (mime::decode_base32hex ("", got), "decode_base32hex empty");
+    t.ok (got == "", "decode_base32hex got empty");
+
+    t.ok (mime::decode_base32hex ("CO======", got), "decode_base32hex CO======");
+    t.ok (got == "f", "decode_base32hex got f");
+
+    t.ok (mime::decode_base32hex ("CPNG====", got), "decode_base32hex CPNG====");
+    t.ok (got == "fo", "decode_base32hex got fo");
+
+    t.ok (mime::decode_base32hex ("CPNMU===", got), "decode_base32hex CPNMU===");
+    t.ok (got == "foo", "decode_base32hex got foo");
+
+    t.ok (mime::decode_base32hex ("CPNMUOG=", got), "decode_base32hex CPNMUOG=");
+    t.ok (got == "foob", "decode_base32hex got foob");
+
+    t.ok (mime::decode_base32hex ("CPNMUOJ1", got), "decode_base32hex CPNMUOJ1");
+    t.ok (got == "fooba", "decode_base32hex got fooba");
+
+    t.ok (mime::decode_base32hex ("CPNMUOJ1E8======", got), "decode_base32hex CPNMUOJ1E8======");
+    t.ok (got == "foobar", "decode_base32hex got foobar");
+}
+
+void
 test_decode_base64_foobar (test::simple& t)
 {
     std::string got;
@@ -870,7 +937,7 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (121);
+    test::simple t (163);
     test_sha256 (t);
     test_sha256_more (t);
     test_sha512 (t);
@@ -889,6 +956,8 @@ main ()
     test_rfc6238_totp (t);
     test_encode_base64_foobar (t);
     test_decode_base64_foobar (t);
+    test_encode_base32_foobar (t);
+    test_decode_base32_foobar (t);
     test_encode_base64 (t);
     test_decode_base64 (t);
     test_encode_base16 (t);
