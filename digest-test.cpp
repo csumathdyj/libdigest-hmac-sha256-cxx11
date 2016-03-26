@@ -518,6 +518,44 @@ test_rfc6238_totp (test::simple& t)
 }
 
 void
+test_encode_base64_foobar (test::simple& t)
+{
+    t.ok (mime::encode_base64 ("", "") == "", "encode_base64 empty");
+    t.ok (mime::encode_base64 ("f", "") == "Zg==", "encode_base64 f");
+    t.ok (mime::encode_base64 ("fo", "") == "Zm8=", "encode_base64 fo");
+    t.ok (mime::encode_base64 ("foo", "") == "Zm9v", "encode_base64 foo");
+    t.ok (mime::encode_base64 ("foob", "") == "Zm9vYg==", "encode_base64 foob");
+    t.ok (mime::encode_base64 ("fooba", "") == "Zm9vYmE=", "encode_base64 fooba");
+    t.ok (mime::encode_base64 ("foobar", "") == "Zm9vYmFy", "encode_base64 foobar");
+}
+
+void
+test_decode_base64_foobar (test::simple& t)
+{
+    std::string got;
+    t.ok (mime::decode_base64 ("", got), "decode_base64 empty");
+    t.ok (got == "", "decode_base64 got empty");
+
+    t.ok (mime::decode_base64 ("Zg==", got), "decode_base64 Zg==");
+    t.ok (got == "f", "decode_base64 got f");
+
+    t.ok (mime::decode_base64 ("Zm8=", got), "decode_base64 Zm8=");
+    t.ok (got == "fo", "decode_base64 got fo");
+
+    t.ok (mime::decode_base64 ("Zm9v", got), "decode_base64 Zm9v");
+    t.ok (got == "foo", "decode_base64 got foo");
+
+    t.ok (mime::decode_base64 ("Zm9vYg==", got), "decode_base64 Zm9vYg==");
+    t.ok (got == "foob", "decode_base64 got foob");
+
+    t.ok (mime::decode_base64 ("Zm9vYmE=", got), "decode_base64 Zm9vYmE=");
+    t.ok (got == "fooba", "decode_base64 got fooba");
+
+    t.ok (mime::decode_base64 ("Zm9vYmFy", got), "decode_base64 Zm9vYmFy");
+    t.ok (got == "foobar", "decode_base64 got foobar");
+}
+
+void
 test_encode_base64 (test::simple& t)
 {
     static const std::basic_string<std::uint8_t> xinput {
@@ -832,7 +870,7 @@ test_pbkdf2_sha256 (test::simple& t)
 int
 main ()
 {
-    test::simple t (100);
+    test::simple t (121);
     test_sha256 (t);
     test_sha256_more (t);
     test_sha512 (t);
@@ -849,6 +887,8 @@ main ()
     test_hmac_6 (t);
     test_hmac_7 (t);
     test_rfc6238_totp (t);
+    test_encode_base64_foobar (t);
+    test_decode_base64_foobar (t);
     test_encode_base64 (t);
     test_decode_base64 (t);
     test_encode_base16 (t);

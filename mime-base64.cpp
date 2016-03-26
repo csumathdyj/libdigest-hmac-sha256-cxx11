@@ -190,6 +190,7 @@ decode_base64basic (std::string const& str64, std::string& octets,
         if ('=' == ch)
             ++npadding;
     }
+    k = 0 == k ? 4 : k;
     if (k == 1 || npadding > 2 || ((! autopadding || npadding > 0) && k + npadding != 4))
         return false;
     npadding = 4 - k;
