@@ -4,7 +4,7 @@
 #include "mime-base64.hpp"
 #include "mime-base32.hpp"
 #include "mime-base16.hpp"
-#include "pbkdf2-sha256.hpp"
+#include "pkcs5-pbkdf2.hpp"
 #include "taptests.hpp"
 
 void
@@ -918,26 +918,33 @@ test_pbkdf2_sha256 (test::simple& t)
 {
     // https://pythonhosted.org/passlib/lib/passlib.hash.pbkdf2_digest.html
 
+    static const std::string IDENT = "$pbkdf2-sha256$";
+    static const std::size_t ROUNDS = 6400U;
+    static const std::size_t KEYLEN = 32U;
+
     static const std::basic_string<std::uint8_t> xsalt {
         0xd1, 0x9a, 0xf3, 0x5e, 0x2b, 0x45, 0x48, 0x69, 0x6d, 0x4d,
         0x09, 0xc1, 0x58, 0xeb, 0x1d, 0x03};
     std::string salt (xsalt.cbegin (), xsalt.cend ());
 
     t.ok (mime::encode_base64crypt (salt) == "0ZrzXitFSGltTQnBWOsdAw",
-        "pbkdf2-sha256 salt");
+        "pbkdf2 salt");
 
-    std::string got = pbkdf2_sha256::encrypt ("password", salt);
+    std::string key = pkcs5::pbkdf2<digest::HMAC<digest::SHA256>> (
+    	"password", salt, ROUNDS, KEYLEN);
+    std::string got = IDENT + std::to_string (ROUNDS)
+    	+ "$" + mime::encode_base64crypt (salt)
+    	+ "$" + mime::encode_base64crypt (key);
     std::string expected
         = "$pbkdf2-sha256$6400$0ZrzXitFSGltTQnBWOsdAw$"
           "Y11AchqV4b0sUisdZd0Xr97KWoymNE0LNNrnEgY4H9M";
     t.ok (got == expected, "pbkdf2-sha256 encrypt salt");
-    t.ok (pbkdf2_sha256::verify ("password", got), "pbkdf2-sha256 verify");
 }
 
 int
 main ()
 {
-    test::simple t (163);
+    test::simple t (162);
     test_sha256 (t);
     test_sha256_more (t);
     test_sha512 (t);
