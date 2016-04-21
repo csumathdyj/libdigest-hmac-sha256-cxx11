@@ -66,7 +66,7 @@ round2 (
 }
 
 void
-SHA1::update_sum (std::string::const_iterator& s)
+SHA1::update_sum (std::string::const_iterator s)
 {
     std::uint32_t w[80];
     std::uint32_t a = sum[0], b = sum[1], c = sum[2], d = sum[3], e = sum[4];

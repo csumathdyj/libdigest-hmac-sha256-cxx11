@@ -14,6 +14,7 @@ public:
     base () : mstate (INIT), mbuf (), mlen (0) {}
     virtual ~base () {}
     virtual base& reset ();
+    virtual base& add (std::string::const_iterator s, std::string::const_iterator e);
     virtual base& add (std::string const& data);
     virtual base& finish ();
     virtual std::string digest () = 0;
@@ -21,7 +22,7 @@ public:
     virtual std::size_t blocksize () const = 0;
 protected:
     virtual void init_sum () = 0;
-    virtual void update_sum (std::string::const_iterator& s) = 0;
+    virtual void update_sum (std::string::const_iterator s) = 0;
     virtual void last_sum () = 0;
 };
 
@@ -32,7 +33,7 @@ public:
     SHA2_32BIT () : base (), sum () {}
     std::size_t blocksize () const { return 64U; }
 protected:
-    void update_sum (std::string::const_iterator& s);
+    void update_sum (std::string::const_iterator s);
     void last_sum ();
 };
 
@@ -43,7 +44,7 @@ public:
     SHA2_64BIT () : base (), sum () {}
     std::size_t blocksize () const { return 128U; }
 protected:
-    void update_sum (std::string::const_iterator& s);
+    void update_sum (std::string::const_iterator s);
     void last_sum ();
 };
 
@@ -55,7 +56,7 @@ public:
     std::string digest ();
 protected:
     void init_sum ();
-    void update_sum (std::string::const_iterator& s);
+    void update_sum (std::string::const_iterator s);
 };
 
 class SHA224 : public SHA2_32BIT {
@@ -132,12 +133,18 @@ public:
     }
 
     base&
-    add (std::string const& data)
+    add (std::string::const_iterator s, std::string::const_iterator e)
     {
         if (ADD != mstate)
             reset ();
-        ihash.add (data);
+        ihash.add (s, e);
         return *this;
+    }
+
+    base&
+    add (std::string const& data)
+    {
+        return add (data.cbegin (), data.cend ());
     }
 
     base&
@@ -158,7 +165,7 @@ public:
 
 protected:
     void init_sum () {}
-    void update_sum (std::string::const_iterator& s) {}
+    void update_sum (std::string::const_iterator s) {}
     void last_sum () {}
 };
 

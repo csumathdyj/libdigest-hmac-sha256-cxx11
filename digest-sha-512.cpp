@@ -94,7 +94,7 @@ round (
 }
 
 void
-SHA2_64BIT::update_sum (std::string::const_iterator& s)
+SHA2_64BIT::update_sum (std::string::const_iterator s)
 {
     static const std::uint64_t K[80] = {
         0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL, 0xb5c0fbcfec4d3b2fULL,

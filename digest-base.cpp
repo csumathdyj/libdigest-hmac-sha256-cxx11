@@ -16,20 +16,18 @@ base::reset ()
 }
 
 base&
-base::add (std::string const& data)
+base::add (std::string::const_iterator s, std::string::const_iterator e)
 {
     if (ADD != mstate)
         reset ();
-    if (data.empty ())
+    if (s >= e)
         return *this;
-    std::string::const_iterator s = data.cbegin ();
-    std::size_t i = 0;
     std::size_t const blksize = blocksize ();
     if (mbuf.size () > 0 && mbuf.size () < blksize) {
-        std::size_t n = std::min (data.size (), blksize - mbuf.size ());
+        std::size_t const datasize = e - s;
+        std::size_t const n = std::min (datasize, blksize - mbuf.size ());
         mbuf.append (s, s + n);
         s += n;
-        i += n;
         mlen += n;
     }
     if (mbuf.size () == blksize) {
@@ -37,16 +35,23 @@ base::add (std::string const& data)
         update_sum (t);
         mbuf.clear ();
     }
-    if (s == data.cend())
+    if (s == e)
         return *this;
-    for (; i + blksize < data.size (); i += blksize) {
-        update_sum (s);
+    for (; s + blksize < e; s += blksize) {
+        std::string::const_iterator t = s;
+        update_sum (t);
         mbuf.clear ();
         mlen += blksize;
     }
-    mbuf.assign (s, data.cend());
+    mbuf.assign (s, e);
     mlen += mbuf.size ();
     return *this;
+}
+
+base&
+base::add (std::string const& data)
+{
+    return add (data.cbegin (), data.cend ());
 }
 
 base&
