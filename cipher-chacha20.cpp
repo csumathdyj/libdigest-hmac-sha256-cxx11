@@ -72,8 +72,7 @@ CHACHA20::chacha20_block (std::uint32_t count, std::array<std::uint8_t,64>& bloc
 
 CHACHA20::CHACHA20 (void) : poly1305 ()
 {
-    iv = 1U;
-    state = INIT;
+    clear ();
 }
 
 CHACHA20&
@@ -83,6 +82,19 @@ CHACHA20::set_key256 (std::array<std::uint8_t,32> const& a)
     for (int i = 0; i < 8; ++i, s += 4) {
         key[i] = unpack32 (s);
     }
+    return *this;
+}
+
+CHACHA20&
+CHACHA20::clear (void)
+{
+    authdata.clear ();
+    nonce.fill (0);
+    iv = 1U;
+    expected_tag.clear ();
+    tag.clear ();
+    state = INIT;
+    pos = 0;
     return *this;
 }
 

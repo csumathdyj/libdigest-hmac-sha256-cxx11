@@ -11,6 +11,7 @@ class CHACHA20 {
 public:
     explicit CHACHA20 (void);
     CHACHA20& set_key256 (std::array<std::uint8_t,32> const& a);
+    CHACHA20& clear (void);
     CHACHA20& add_authdata (std::string const& a);
     CHACHA20& set_counter (std::uint32_t const x);
     CHACHA20& set_nonce (std::string const& a);
