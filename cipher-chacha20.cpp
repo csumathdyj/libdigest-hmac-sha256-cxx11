@@ -194,9 +194,12 @@ CHACHA20::good (void)
     // constant-time comparison while tag == expected_tag
     authtag ();
     bool ok = true;
-    for (int i = 0; i < tag.size (); ++i)
-        if (i >= expected_tag.size () || tag[i] != expected_tag[i])
-            ok = false;
+    for (int i = 0; i < tag.size (); ++i) {
+        volatile bool const prev_ok = ok;
+        volatile bool const not_ok = false;
+        int const expected_c = i >= expected_tag.size () ? 0 : expected_tag[i];
+        ok = tag[i] == expected_c ? prev_ok : not_ok;
+    }
     return ok;
 }
 
