@@ -4,7 +4,10 @@ SHA-2, HMAC, PBKDF2
 SHA-256, SHA-384, SHA-512, SHA-512/256 classes,
 HMAC class template,
 PKCS#5 PBKDF2 template function,
-MIME BASE 64/32/16 encoding and decoding functions
+MIME BASE 64/32/16 encoding and decoding functions,
+CMAC and AES-SIV class,
+GHASH and AES-GCM class,
+POLY1305 and CHACHA20 class,
 for C++11.
 
 SYNOPSIS
