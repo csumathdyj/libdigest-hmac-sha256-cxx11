@@ -163,7 +163,9 @@ CHACHA20::update (std::string::const_iterator s, std::string::const_iterator e)
     while (s < e) {
         dst.push_back (static_cast<std::uint8_t> (*s++) ^ key_stream[pos]);
         if (++pos >= key_stream.size ()) {
-            chacha20_block (++counter, key_stream);
+            if (++counter == iv)
+                throw std::runtime_error ("chacha20 counter overflow");
+            chacha20_block (counter, key_stream);
             pos = 0;
         }
     }

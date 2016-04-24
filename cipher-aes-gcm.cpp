@@ -110,6 +110,8 @@ AES_GCM::update (std::string::const_iterator s, std::string::const_iterator e)
         throw std::runtime_error ("update() decends encrypt() or decrypt().");
     if (s >= e)
         return "";
+    if (DECRYPT == state)
+        ghash.add (s, e);
     std::string dst;
     while (s < e) {
         dst.push_back (static_cast<std::uint8_t> (*s++) ^ key_stream[pos]);
@@ -120,8 +122,6 @@ AES_GCM::update (std::string::const_iterator s, std::string::const_iterator e)
     }
     if (ENCRYPT == state)
         ghash.add (dst.cbegin (), dst.cend ());
-    else
-        ghash.add (s, e);
     return std::move (dst);
 }
 
