@@ -8,6 +8,10 @@
 
 namespace digest {
 
+// based on poly1305-donna
+//   https://github.com/floodyberry/poly1305-donna
+//   LICENSE: MIT or PUBLIC DOMAIN
+
 // poly1305 sum[i+1] == (sum[i] + (message_block|[0x01])) * r mod prime
 // prime == 130**2 - 5
 //
@@ -54,6 +58,7 @@ pack64 (std::uint64_t const x, std::string::iterator const s)
     s[7] = (x >> 56) & 0xff;
 }
 
+// polynomial add little endian unsigned 128 bit
 static inline void
 add128 (std::uint32_t const n0, std::uint32_t const n1,
     std::uint32_t const n2, std::uint32_t const n3,
@@ -66,6 +71,7 @@ add128 (std::uint32_t const n0, std::uint32_t const n1,
     a[4] += n3 >> 8;
 }
 
+// to little endian unsigned 128 bit
 static inline void
 pack128 (std::array<std::uint32_t,5> const& a, std::string::iterator t)
 {
@@ -78,6 +84,7 @@ pack128 (std::array<std::uint32_t,5> const& a, std::string::iterator t)
     pack32 ((b[4] << 8) | (b[3] >> 18), t + 12);
 }
 
+// unsigned 130 bit carry up
 static inline std::uint32_t
 full_carry (std::array<std::uint32_t,5>& a)
 {
@@ -90,6 +97,7 @@ full_carry (std::array<std::uint32_t,5>& a)
     return carry;
 }
 
+// polynomial 5 * 64 bit carry up
 static inline std::uint64_t
 full_carry (std::array<std::uint64_t,5> const& c, std::array<std::uint32_t,5>& a)
 {
@@ -108,6 +116,7 @@ mul64 (std::uint32_t const a, std::uint32_t const b)
     return static_cast<std::uint64_t> (a) * b;
 }
 
+// partial mul (mod prime)  prime == (1<<130) - 5
 static inline void
 mul_mod (std::array<std::uint32_t,5> const& r,
     std::array<std::uint32_t,5> const& f, std::array<std::uint32_t,5>& a, 
@@ -125,10 +134,11 @@ mul_mod (std::array<std::uint32_t,5> const& r,
          + mul64 (a[1], r[3]) + mul64 (a[0], r[4]);
 
     std::uint64_t overflow = full_carry (c, a) * 5 + a[0];
-    a[1] += overflow >> 26;
+    a[1] += overflow >> 26; // may be 27 bit
     a[0] = static_cast<std::uint32_t> (overflow) & MASK26;
 }
 
+// complete mul (mod primt)  prime == (1<<130) - 5
 static inline void
 complete_mul_mod (std::array<std::uint32_t,5>& a)
 {
@@ -252,3 +262,31 @@ POLY1305::digest ()
 }
 
 }//namespace digest
+
+/* Copyright (c) 2016, MIZUTANI Tociyuki
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */

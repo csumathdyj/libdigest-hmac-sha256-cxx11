@@ -144,15 +144,6 @@ COPYRIGHT AND LICENSE
 Copyright (c) 2016, MIZUTANI Tociyuki  
 All rights reserved.
 
-for cipher-aes.cpp:
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
-
-for otherwise sources:
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 

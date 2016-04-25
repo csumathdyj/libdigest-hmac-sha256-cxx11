@@ -22,19 +22,24 @@ test_key128 (test::simple& t)
         {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
          0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
     };
-    AES_BLOCK const expected_cipher {
+    AES_BLOCK const cipher {
         {0x69, 0xc4, 0xe0, 0xd8, 0x6a, 0x7b, 0x04, 0x30,
          0xd8, 0xcd, 0xb7, 0x80, 0x70, 0xb4, 0xc5, 0x5a},
     };
-    AES_BLOCK got_cipher;
-    AES_BLOCK got_plain;
-
-    cipher::AES aes;
-    aes.set_key128 (key128);
-    aes.encrypt (plain, got_cipher);
-    aes.decrypt (got_cipher, got_plain);
-    t.ok (expected_cipher == got_cipher, "encrypt key128");
-    t.ok (plain == got_plain, "decrypt key128");
+    {
+        cipher::AES aes;
+        AES_BLOCK got_cipher;
+        aes.set_encrypt_key128 (key128);
+        aes.encrypt (plain, got_cipher);
+        t.ok (cipher == got_cipher, "encrypt key128");
+    }
+    {
+        cipher::AES aes;
+        AES_BLOCK got_plain;
+        aes.set_decrypt_key128 (key128);
+        aes.decrypt (cipher, got_plain);
+        t.ok (plain == got_plain, "encrypt key128");
+    }
 }
 
 // C.2 AES-192
@@ -50,19 +55,24 @@ test_key192 (test::simple& t)
         {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
          0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
     };
-    AES_BLOCK const expected_cipher {
+    AES_BLOCK const cipher {
         {0xdd, 0xa9, 0x7c, 0xa4, 0x86, 0x4c, 0xdf, 0xe0,
          0x6e, 0xaf, 0x70, 0xa0, 0xec, 0x0d, 0x71, 0x91},
     };
-    AES_BLOCK got_cipher;
-    AES_BLOCK got_plain;
-
-    cipher::AES aes;
-    aes.set_key192 (key192);
-    aes.encrypt (plain, got_cipher);
-    aes.decrypt (got_cipher, got_plain);
-    t.ok (expected_cipher == got_cipher, "encrypt key192");
-    t.ok (plain == got_plain, "decrypt key192");
+    {
+        cipher::AES aes;
+        AES_BLOCK got_cipher;
+        aes.set_encrypt_key192 (key192);
+        aes.encrypt (plain, got_cipher);
+        t.ok (cipher == got_cipher, "encrypt key192");
+    }
+    {
+        cipher::AES aes;
+        AES_BLOCK got_plain;
+        aes.set_decrypt_key192 (key192);
+        aes.decrypt (cipher, got_plain);
+        t.ok (plain == got_plain, "encrypt key192");
+    }
 }
 
 // C.3 AES-256
@@ -79,19 +89,24 @@ test_key256 (test::simple& t)
         {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
          0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
     };
-    AES_BLOCK const expected_cipher {
+    AES_BLOCK const cipher {
         {0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45, 0xbf,
          0xea, 0xfc, 0x49, 0x90, 0x4b, 0x49, 0x60, 0x89},
     };
-    AES_BLOCK got_cipher;
-    AES_BLOCK got_plain;
-
-    cipher::AES aes;
-    aes.set_key256 (key256);
-    aes.encrypt (plain, got_cipher);
-    aes.decrypt (got_cipher, got_plain);
-    t.ok (expected_cipher == got_cipher, "encrypt key256");
-    t.ok (plain == got_plain, "decrypt key256");
+    {
+        cipher::AES aes;
+        AES_BLOCK got_cipher;
+        aes.set_encrypt_key256 (key256);
+        aes.encrypt (plain, got_cipher);
+        t.ok (cipher == got_cipher, "encrypt key256");
+    }
+    {
+        cipher::AES aes;
+        AES_BLOCK got_plain;
+        aes.set_decrypt_key256 (key256);
+        aes.decrypt (cipher, got_plain);
+        t.ok (plain == got_plain, "encrypt key256");
+    }
 }
 
 }//namespace
