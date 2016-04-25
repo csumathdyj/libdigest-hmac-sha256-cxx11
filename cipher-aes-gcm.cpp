@@ -18,12 +18,34 @@ AES_GCM::AES_GCM (void) : ghash (), aes ()
 AES_GCM&
 AES_GCM::set_key128 (std::array<std::uint8_t,16> const& key128)
 {
+    aes.set_key128 (key128);
+    set_ghash_key ();
+    return *this;
+}
+
+AES_GCM&
+AES_GCM::set_key192 (std::array<std::uint8_t,24> const& key192)
+{
+    aes.set_key192 (key192);
+    set_ghash_key ();
+    return *this;
+}
+
+AES_GCM&
+AES_GCM::set_key256 (std::array<std::uint8_t,32> const& key256)
+{
+    aes.set_key256 (key256);
+    set_ghash_key ();
+    return *this;
+}
+
+void
+AES_GCM::set_ghash_key (void)
+{
     AES::BLOCK zero {{0}};
     AES::BLOCK hash_key;
-    aes.set_key128 (key128);
     aes.encrypt (zero, hash_key);
     ghash.set_key128 (hash_key);
-    return *this;
 }
 
 AES_GCM&

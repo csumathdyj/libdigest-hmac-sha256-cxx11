@@ -10,19 +10,23 @@
 // Appendix B AES Test Vectors
 
 struct spec_type {
+    std::string name;
     std::string hashkey, authdata, ciphertext, ghashsum;
 } spec[] = {
-    {"66e94bd4ef8a2c3b884cfa59ca342b2e",
+    {"test case 1",
+     "66e94bd4ef8a2c3b884cfa59ca342b2e",
      "",
      "",
      "00000000000000000000000000000000"},
 
-    {"66e94bd4ef8a2c3b884cfa59ca342b2e",
+    {"test case 2",
+     "66e94bd4ef8a2c3b884cfa59ca342b2e",
      "",
      "0388dace60b6a392f328c2b971b2fe78",
      "f38cbb1ad69223dcc3457ae5b6b0f885"},
 
-    {"b83b533708bf535d0aa6e52980d53b78",
+    {"test case 3",
+     "b83b533708bf535d0aa6e52980d53b78",
      "",
      "42831ec2217774244b7221b784d0d49c"
      "e3aa212f2c02a4e035c17e2329aca12e"
@@ -30,7 +34,8 @@ struct spec_type {
      "1ba30b396a0aac973d58e091473f5985",
      "7f1b32b81b820d02614f8895ac1d4eac"},
 
-    {"b83b533708bf535d0aa6e52980d53b78",
+    {"test case 4",
+     "b83b533708bf535d0aa6e52980d53b78",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "42831ec2217774244b7221b784d0d49c"
@@ -39,7 +44,8 @@ struct spec_type {
      "1ba30b396a0aac973d58e091",
      "698e57f70e6ecc7fd9463b7260a9ae5f"},
 
-    {"b83b533708bf535d0aa6e52980d53b78",
+    {"test case 5",
+     "b83b533708bf535d0aa6e52980d53b78",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "61353b4c2806934a777ff51fa22a4755"
@@ -48,7 +54,8 @@ struct spec_type {
      "4989b5e1ebac0f07c23f4598",
      "df586bb4c249b92cb6922877e444d37b"},
 
-    {"b83b533708bf535d0aa6e52980d53b78",
+    {"test case 6",
+     "b83b533708bf535d0aa6e52980d53b78",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "8ce24998625615b603a033aca13fb894"
@@ -57,17 +64,20 @@ struct spec_type {
      "d62875d2aca417034c34aee5",
      "1c5afe9760d3932f3c9a878aac3dc3de"},
 
-    {"aae06992acbf52a3e8f4a96ec9300bd7",
+    {"test case 7",
+     "aae06992acbf52a3e8f4a96ec9300bd7",
      "",
      "",
      "00000000000000000000000000000000"},
 
-    {"aae06992acbf52a3e8f4a96ec9300bd7",
+    {"test case 8",
+     "aae06992acbf52a3e8f4a96ec9300bd7",
      "",
      "98e7247c07f0fe411c267e4384b0f600",
      "e2c63f0ac44ad0e02efa05ab6743d4ce"},
 
-    {"466923ec9ae682214f2c082badb39249",
+    {"test case 9",
+     "466923ec9ae682214f2c082badb39249",
      "",
      "3980ca0b3c00e841eb06fac4872a2757"
      "859e1ceaa6efd984628593b40ca1e19c"
@@ -75,7 +85,8 @@ struct spec_type {
      "18e2448b2fe324d9ccda2710acade256",
      "51110d40f6c8fff0eb1ae33445a889f0"},
 
-    {"466923ec9ae682214f2c082badb39249",
+    {"test case 10",
+     "466923ec9ae682214f2c082badb39249",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "3980ca0b3c00e841eb06fac4872a2757"
@@ -84,7 +95,8 @@ struct spec_type {
      "18e2448b2fe324d9ccda2710",
      "ed2ce3062e4a8ec06db8b4c490e8a268"},
 
-    {"466923ec9ae682214f2c082badb39249",
+    {"test case 11",
+     "466923ec9ae682214f2c082badb39249",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "0f10f599ae14a154ed24b36e25324db8"
@@ -93,7 +105,8 @@ struct spec_type {
      "e93a19a58e8b473fa0f062f7",
      "1e6a133806607858ee80eaf237064089"},
 
-    {"466923ec9ae682214f2c082badb39249",
+    {"test case 12",
+     "466923ec9ae682214f2c082badb39249",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "d27e88681ce3243c4830165a8fdcf9ff"
@@ -102,17 +115,20 @@ struct spec_type {
      "e67c036745fa22e7e9b7373b",
      "82567fb0b4cc371801eadec005968e94"},
 
-    {"dc95c078a2408989ad48a21492842087",
+    {"test case 13",
+     "dc95c078a2408989ad48a21492842087",
      "",
      "",
      "00000000000000000000000000000000"},
 
-    {"dc95c078a2408989ad48a21492842087",
+    {"test case 14",
+     "dc95c078a2408989ad48a21492842087",
      "",
      "cea7403d4d606b6e074ec5d3baf39d18",
      "83de425c5edc5d498f382c441041ca92"},
 
-    {"acbef20579b4b8ebce889bac8732dad7",
+    {"test case 15",
+     "acbef20579b4b8ebce889bac8732dad7",
      "",
      "522dc1f099567d07f47f37a32a84427d"
      "643a8cdcbfe5c0c97598a2bd2555d1aa"
@@ -120,7 +136,8 @@ struct spec_type {
      "c5f61e6393ba7a0abcc9f662898015ad",
      "4db870d37cb75fcb46097c36230d1612"},
 
-    {"acbef20579b4b8ebce889bac8732dad7",
+    {"test case 16",
+     "acbef20579b4b8ebce889bac8732dad7",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "522dc1f099567d07f47f37a32a84427d"
@@ -129,7 +146,8 @@ struct spec_type {
      "c5f61e6393ba7a0abcc9f662",
      "8bd0c4d8aacd391e67cca447e8c38f65"},
 
-    {"acbef20579b4b8ebce889bac8732dad7",
+    {"test case 17",
+     "acbef20579b4b8ebce889bac8732dad7",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "c3762df1ca787d32ae47c13bf19844cb"
@@ -138,7 +156,8 @@ struct spec_type {
      "62ac430e64abe499f47c9b1f",
      "75a34288b8c68f811c52b2e9a2f97f63"},
 
-    {"acbef20579b4b8ebce889bac8732dad7",
+    {"test case 18",
+     "acbef20579b4b8ebce889bac8732dad7",
      "feedfacedeadbeeffeedfacedeadbeef"
      "abaddad2",
      "5a8def2f0c9e53f1f75d7853659e2a20"
