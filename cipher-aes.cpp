@@ -8,11 +8,12 @@ using BLOCK = typename AES::BLOCK;
 // little-endian arrangement from big-endian's
 // based on http://www.efgh.com/software/rijndael.htm
 
-//  SBOX[i] == pack32(sbox[i], sbox[i], sbox[i], sbox[i])
-//   Te0[i] == pack32(2*sbox[i], 1*sbox[i], 1*sbox[i], 3*sbox[i])
-//   Te1[i] == pack32(3*sbox[i], 2*sbox[i], 1*sbox[i], 1*sbox[i])
-//   Te2[i] == pack32(1*sbox[i], 3*sbox[i], 2*sbox[i], 1*sbox[i])
-//   Te3[i] == pack32(1*sbox[i], 1*sbox[i], 3*sbox[i], 2*sbox[i])
+//  SBOX[i] == unpack32(sbox[i], sbox[i], sbox[i], sbox[i])
+//   Te0[i] == unpack32(2*sbox[i], 1*sbox[i], 1*sbox[i], 3*sbox[i])
+//   Te1[i] == unpack32(3*sbox[i], 2*sbox[i], 1*sbox[i], 1*sbox[i])
+//   Te2[i] == unpack32(1*sbox[i], 3*sbox[i], 2*sbox[i], 1*sbox[i])
+//   Te3[i] == unpack32(1*sbox[i], 1*sbox[i], 3*sbox[i], 2*sbox[i])
+//  where C*sbox[i] means galois field multiplication of C and sbox[i].
 
 static const std::uint32_t SBOX[256] = {
     0x63636363UL, 0x7c7c7c7cUL, 0x77777777UL, 0x7b7b7b7bUL, 0xf2f2f2f2UL,
@@ -289,11 +290,12 @@ static const std::uint32_t Te3[256] = {
     0x2c3a1616UL,
 };
 
-//  IBOX[i] == pack32(ibox[i], ibox[i], ibox[i], ibox[i])
-//   Td0[i] == pack32(14*ibox[i],  9*ibox[i], 13*ibox[i], 11*ibox[i])
-//   Td1[i] == pack32(11*ibox[i], 14*ibox[i],  9*ibox[i], 13*ibox[i])
-//   Td2[i] == pack32(13*ibox[i], 11*ibox[i], 14*ibox[i],  9*ibox[i])
-//   Td3[i] == pack32( 9*ibox[i], 13*ibox[i], 11*ibox[i], 14*ibox[i])
+//  IBOX[i] == unpack32(ibox[i], ibox[i], ibox[i], ibox[i])
+//   Td0[i] == unpack32(14*ibox[i],  9*ibox[i], 13*ibox[i], 11*ibox[i])
+//   Td1[i] == unpack32(11*ibox[i], 14*ibox[i],  9*ibox[i], 13*ibox[i])
+//   Td2[i] == unpack32(13*ibox[i], 11*ibox[i], 14*ibox[i],  9*ibox[i])
+//   Td3[i] == unpack32( 9*ibox[i], 13*ibox[i], 11*ibox[i], 14*ibox[i])
+//  where C*isbox[i] means galois field multiplication of C and isbox[i].
 
 static const std::uint32_t IBOX[256] = {
     0x52525252UL, 0x09090909UL, 0x6a6a6a6aUL, 0xd5d5d5d5UL, 0x30303030UL,
@@ -593,76 +595,60 @@ pack32 (std::uint8_t& c0, std::uint8_t& c1,
 static inline uint32_t
 subbyte (std::uint32_t const a)
 {
-    return (SBOX[(a      ) & 0xff] & 0x000000ff)
-         ^ (SBOX[(a >>  8) & 0xff] & 0x0000ff00)
-         ^ (SBOX[(a >> 16) & 0xff] & 0x00ff0000)
-         ^ (SBOX[(a >> 24) & 0xff] & 0xff000000);
-}
-
-static inline uint32_t
-subbyte (std::uint32_t const box[],
-         std::uint32_t const a0, std::uint32_t const a1,
-         std::uint32_t const a2, std::uint32_t const a3)
-{
-    return (box[(a0      ) & 0xff] & 0x000000ff)
-         ^ (box[(a1 >>  8) & 0xff] & 0x0000ff00)
-         ^ (box[(a2 >> 16) & 0xff] & 0x00ff0000)
-         ^ (box[(a3 >> 24) & 0xff] & 0xff000000);
+    return (SBOX[(a      ) & 0xff] & 0x000000ffUL)
+         ^ (SBOX[(a >>  8) & 0xff] & 0x0000ff00UL)
+         ^ (SBOX[(a >> 16) & 0xff] & 0x00ff0000UL)
+         ^ (SBOX[(a >> 24) & 0xff] & 0xff000000UL);
 }
 
 static inline uint32_t
 subbyterot (std::uint32_t const a)
 {
-    return (SBOX[(a >>  8) & 0xff] & 0x000000ff)
-         ^ (SBOX[(a >> 16) & 0xff] & 0x0000ff00)
-         ^ (SBOX[(a >> 24) & 0xff] & 0x00ff0000)
-         ^ (SBOX[(a      ) & 0xff] & 0xff000000);
+    return (SBOX[(a >>  8) & 0xff] & 0x000000ffUL)
+         ^ (SBOX[(a >> 16) & 0xff] & 0x0000ff00UL)
+         ^ (SBOX[(a >> 24) & 0xff] & 0x00ff0000UL)
+         ^ (SBOX[(a      ) & 0xff] & 0xff000000UL);
 }
 
 static inline uint32_t
-subbyterot (std::uint32_t const s0, std::uint32_t const s1,
-            std::uint32_t const s2, std::uint32_t const s3)
+inv_mix_column (std::uint32_t const s)
 {
-    return Te0[(s0      ) & 0xff]
-         ^ Te1[(s1 >>  8) & 0xff]
-         ^ Te2[(s2 >> 16) & 0xff]
-         ^ Te3[(s3 >> 24) & 0xff];
+    return Td0[SBOX[(s      ) & 0xff] & 0xff]
+         ^ Td1[SBOX[(s >>  8) & 0xff] & 0xff]
+         ^ Td2[SBOX[(s >> 16) & 0xff] & 0xff]
+         ^ Td3[SBOX[(s >> 24) & 0xff] & 0xff];
+}
+
+static inline void
+enround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t& t3,
+    std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
+    std::uint32_t const *keys)
+{
+    t0 = Te0[s0 & 0xff] ^ Te1[(s1 >> 8) & 0xff] ^ Te2[(s2 >> 16) & 0xff] ^ Te3[(s3 >> 24) & 0xff] ^ keys[0];
+    t1 = Te0[s1 & 0xff] ^ Te1[(s2 >> 8) & 0xff] ^ Te2[(s3 >> 16) & 0xff] ^ Te3[(s0 >> 24) & 0xff] ^ keys[1];
+    t2 = Te0[s2 & 0xff] ^ Te1[(s3 >> 8) & 0xff] ^ Te2[(s0 >> 16) & 0xff] ^ Te3[(s1 >> 24) & 0xff] ^ keys[2];
+    t3 = Te0[s3 & 0xff] ^ Te1[(s0 >> 8) & 0xff] ^ Te2[(s1 >> 16) & 0xff] ^ Te3[(s2 >> 24) & 0xff] ^ keys[3];
+}
+
+static inline void
+deround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t& t3,
+    std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
+    std::uint32_t const *ikeys)
+{
+    t0 = Td0[s0 & 0xff] ^ Td1[(s3 >> 8) & 0xff] ^ Td2[(s2 >> 16) & 0xff] ^ Td3[(s1 >> 24) & 0xff] ^ ikeys[0];
+    t1 = Td0[s1 & 0xff] ^ Td1[(s0 >> 8) & 0xff] ^ Td2[(s3 >> 16) & 0xff] ^ Td3[(s2 >> 24) & 0xff] ^ ikeys[1];
+    t2 = Td0[s2 & 0xff] ^ Td1[(s1 >> 8) & 0xff] ^ Td2[(s0 >> 16) & 0xff] ^ Td3[(s3 >> 24) & 0xff] ^ ikeys[2];
+    t3 = Td0[s3 & 0xff] ^ Td1[(s2 >> 8) & 0xff] ^ Td2[(s1 >> 16) & 0xff] ^ Td3[(s0 >> 24) & 0xff] ^ ikeys[3];
 }
 
 static inline uint32_t
-isubbyterot (std::uint32_t const s0, std::uint32_t const s1,
-            std::uint32_t const s2, std::uint32_t const s3)
+subbyte_last (std::uint32_t const box[],
+    std::uint32_t const t0, std::uint32_t const t1, std::uint32_t const t2, std::uint32_t const t3)
 {
-    return Td0[(s0      ) & 0xff]
-         ^ Td1[(s1 >>  8) & 0xff]
-         ^ Td2[(s2 >> 16) & 0xff]
-         ^ Td3[(s3 >> 24) & 0xff];
-}
-
-static inline void
-enround (std::uint32_t& t0, std::uint32_t& t1,
-         std::uint32_t& t2, std::uint32_t& t3,
-         std::uint32_t const s0, std::uint32_t const s1,
-         std::uint32_t const s2, std::uint32_t const s3,
-         std::uint32_t const *keys)
-{
-    t0 = subbyterot (s0, s1, s2, s3) ^ keys[0];
-    t1 = subbyterot (s1, s2, s3, s0) ^ keys[1];
-    t2 = subbyterot (s2, s3, s0, s1) ^ keys[2];
-    t3 = subbyterot (s3, s0, s1, s2) ^ keys[3];
-}
-
-static inline void
-deround (std::uint32_t& t0, std::uint32_t& t1,
-         std::uint32_t& t2, std::uint32_t& t3,
-         std::uint32_t const s0, std::uint32_t const s1,
-         std::uint32_t const s2, std::uint32_t const s3,
-         std::uint32_t const *ikeys)
-{
-    t0 = isubbyterot (s0, s3, s2, s1) ^ ikeys[0];
-    t1 = isubbyterot (s1, s0, s3, s2) ^ ikeys[1];
-    t2 = isubbyterot (s2, s1, s0, s3) ^ ikeys[2];
-    t3 = isubbyterot (s3, s2, s1, s0) ^ ikeys[3];
+    return (box[(t0      ) & 0xff] & 0x000000ffUL)
+         ^ (box[(t1 >>  8) & 0xff] & 0x0000ff00UL)
+         ^ (box[(t2 >> 16) & 0xff] & 0x00ff0000UL)
+         ^ (box[(t3 >> 24) & 0xff] & 0xff000000UL);
 }
 
 void
@@ -752,22 +738,10 @@ AES::schedule_decrypt_keys (int const nk, int const nr, std::uint32_t* rk)
     }
     for (int i = 1; i < nrounds; ++i) {
         rk += 4;
-        rk[0] = Td0[SBOX[(rk[0]      ) & 0xff] & 0xff]
-              ^ Td1[SBOX[(rk[0] >>  8) & 0xff] & 0xff]
-              ^ Td2[SBOX[(rk[0] >> 16) & 0xff] & 0xff]
-              ^ Td3[SBOX[(rk[0] >> 24) & 0xff] & 0xff];
-        rk[1] = Td0[SBOX[(rk[1]      ) & 0xff] & 0xff]
-              ^ Td1[SBOX[(rk[1] >>  8) & 0xff] & 0xff]
-              ^ Td2[SBOX[(rk[1] >> 16) & 0xff] & 0xff]
-              ^ Td3[SBOX[(rk[1] >> 24) & 0xff] & 0xff];
-        rk[2] = Td0[SBOX[(rk[2]      ) & 0xff] & 0xff]
-              ^ Td1[SBOX[(rk[2] >>  8) & 0xff] & 0xff]
-              ^ Td2[SBOX[(rk[2] >> 16) & 0xff] & 0xff]
-              ^ Td3[SBOX[(rk[2] >> 24) & 0xff] & 0xff];
-        rk[3] = Td0[SBOX[(rk[3]      ) & 0xff] & 0xff]
-              ^ Td1[SBOX[(rk[3] >>  8) & 0xff] & 0xff]
-              ^ Td2[SBOX[(rk[3] >> 16) & 0xff] & 0xff]
-              ^ Td3[SBOX[(rk[3] >> 24) & 0xff] & 0xff];
+        rk[0] = inv_mix_column (rk[0]);
+        rk[1] = inv_mix_column (rk[1]);
+        rk[2] = inv_mix_column (rk[2]);
+        rk[3] = inv_mix_column (rk[3]);
     }
 }
 
@@ -799,10 +773,10 @@ AES::encrypt (BLOCK const& plain, BLOCK& secret)
         }
     }
     int rk = nrounds << 2;
-    s0 = subbyte (SBOX, t0, t1, t2, t3) ^ keys[rk];
-    s1 = subbyte (SBOX, t1, t2, t3, t0) ^ keys[rk + 1];
-    s2 = subbyte (SBOX, t2, t3, t0, t1) ^ keys[rk + 2];
-    s3 = subbyte (SBOX, t3, t0, t1, t2) ^ keys[rk + 3];
+    s0 = subbyte_last (SBOX, t0, t1, t2, t3) ^ keys[rk];
+    s1 = subbyte_last (SBOX, t1, t2, t3, t0) ^ keys[rk + 1];
+    s2 = subbyte_last (SBOX, t2, t3, t0, t1) ^ keys[rk + 2];
+    s3 = subbyte_last (SBOX, t3, t0, t1, t2) ^ keys[rk + 3];
 
     pack32 (secret[ 0], secret[ 1], secret[ 2], secret[ 3], s0);
     pack32 (secret[ 4], secret[ 5], secret[ 6], secret[ 7], s1);
@@ -838,10 +812,10 @@ AES::decrypt (BLOCK const& secret, BLOCK& plain)
         }
     }
     int rk = nrounds << 2;
-    s0 = subbyte (IBOX, t0, t3, t2, t1) ^ ikeys[rk];
-    s1 = subbyte (IBOX, t1, t0, t3, t2) ^ ikeys[rk + 1];
-    s2 = subbyte (IBOX, t2, t1, t0, t3) ^ ikeys[rk + 2];
-    s3 = subbyte (IBOX, t3, t2, t1, t0) ^ ikeys[rk + 3];
+    s0 = subbyte_last (IBOX, t0, t3, t2, t1) ^ ikeys[rk];
+    s1 = subbyte_last (IBOX, t1, t0, t3, t2) ^ ikeys[rk + 1];
+    s2 = subbyte_last (IBOX, t2, t1, t0, t3) ^ ikeys[rk + 2];
+    s3 = subbyte_last (IBOX, t3, t2, t1, t0) ^ ikeys[rk + 3];
 
     pack32 (plain[ 0], plain[ 1], plain[ 2], plain[ 3], s0);
     pack32 (plain[ 4], plain[ 5], plain[ 6], plain[ 7], s1);
