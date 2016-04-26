@@ -572,6 +572,36 @@ static const std::uint32_t Td3[256] = {
     0xd04257b8UL,
 };
 
+static inline uint32_t
+rotbyte (std::uint32_t const a)
+{
+    return (a << 24) | (a >> 8);
+}
+
+static inline std::uint8_t
+byte0 (std::uint32_t const a)
+{
+    return a & 0xff;
+}
+
+static inline std::uint8_t
+byte1 (std::uint32_t const a)
+{
+    return (a >> 8) & 0xff;
+}
+
+static inline std::uint8_t
+byte2 (std::uint32_t const a)
+{
+    return (a >> 16) & 0xff;
+}
+
+static inline std::uint8_t
+byte3 (std::uint32_t const a)
+{
+    return (a >> 24) & 0xff;
+}
+
 static inline std::uint32_t
 unpack32 (std::uint8_t const c0, std::uint8_t const c1,
           std::uint8_t const c2, std::uint8_t const c3)
@@ -586,37 +616,28 @@ static inline void
 pack32 (std::uint8_t& c0, std::uint8_t& c1,
         std::uint8_t& c2, std::uint8_t& c3, std::uint32_t const a)
 {
-    c0 = a & 0xff;
-    c1 = (a >>  8) & 0xff;
-    c2 = (a >> 16) & 0xff;
-    c3 = (a >> 24) & 0xff;
+    c0 = byte0 (a);
+    c1 = byte1 (a);
+    c2 = byte2 (a);
+    c3 = byte3 (a);
 }
 
 static inline uint32_t
 subbyte (std::uint32_t const a)
 {
-    return (SBOX[(a      ) & 0xff] & 0x000000ffUL)
-         ^ (SBOX[(a >>  8) & 0xff] & 0x0000ff00UL)
-         ^ (SBOX[(a >> 16) & 0xff] & 0x00ff0000UL)
-         ^ (SBOX[(a >> 24) & 0xff] & 0xff000000UL);
+    return (SBOX[byte0 (a)] & 0x000000ffUL)
+         ^ (SBOX[byte1 (a)] & 0x0000ff00UL)
+         ^ (SBOX[byte2 (a)] & 0x00ff0000UL)
+         ^ (SBOX[byte3 (a)] & 0xff000000UL);
 }
 
 static inline uint32_t
-subbyterot (std::uint32_t const a)
+inv_mix_column (std::uint32_t const a)
 {
-    return (SBOX[(a >>  8) & 0xff] & 0x000000ffUL)
-         ^ (SBOX[(a >> 16) & 0xff] & 0x0000ff00UL)
-         ^ (SBOX[(a >> 24) & 0xff] & 0x00ff0000UL)
-         ^ (SBOX[(a      ) & 0xff] & 0xff000000UL);
-}
-
-static inline uint32_t
-inv_mix_column (std::uint32_t const s)
-{
-    return Td0[SBOX[(s      ) & 0xff] & 0xff]
-         ^ Td1[SBOX[(s >>  8) & 0xff] & 0xff]
-         ^ Td2[SBOX[(s >> 16) & 0xff] & 0xff]
-         ^ Td3[SBOX[(s >> 24) & 0xff] & 0xff];
+    return Td0[SBOX[byte0 (a)] & 0xff]
+         ^ Td1[SBOX[byte1 (a)] & 0xff]
+         ^ Td2[SBOX[byte2 (a)] & 0xff]
+         ^ Td3[SBOX[byte3 (a)] & 0xff];
 }
 
 static inline void
@@ -624,10 +645,10 @@ enround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
     std::uint32_t const *keys)
 {
-    t0 = Te0[s0 & 0xff] ^ Te1[(s1 >> 8) & 0xff] ^ Te2[(s2 >> 16) & 0xff] ^ Te3[(s3 >> 24) & 0xff] ^ keys[0];
-    t1 = Te0[s1 & 0xff] ^ Te1[(s2 >> 8) & 0xff] ^ Te2[(s3 >> 16) & 0xff] ^ Te3[(s0 >> 24) & 0xff] ^ keys[1];
-    t2 = Te0[s2 & 0xff] ^ Te1[(s3 >> 8) & 0xff] ^ Te2[(s0 >> 16) & 0xff] ^ Te3[(s1 >> 24) & 0xff] ^ keys[2];
-    t3 = Te0[s3 & 0xff] ^ Te1[(s0 >> 8) & 0xff] ^ Te2[(s1 >> 16) & 0xff] ^ Te3[(s2 >> 24) & 0xff] ^ keys[3];
+    t0 = Te0[byte0 (s0)] ^ Te1[byte1 (s1)] ^ Te2[byte2 (s2)] ^ Te3[byte3 (s3)] ^ keys[0];
+    t1 = Te0[byte0 (s1)] ^ Te1[byte1 (s2)] ^ Te2[byte2 (s3)] ^ Te3[byte3 (s0)] ^ keys[1];
+    t2 = Te0[byte0 (s2)] ^ Te1[byte1 (s3)] ^ Te2[byte2 (s0)] ^ Te3[byte3 (s1)] ^ keys[2];
+    t3 = Te0[byte0 (s3)] ^ Te1[byte1 (s0)] ^ Te2[byte2 (s1)] ^ Te3[byte3 (s2)] ^ keys[3];
 }
 
 static inline void
@@ -635,20 +656,20 @@ deround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
     std::uint32_t const *ikeys)
 {
-    t0 = Td0[s0 & 0xff] ^ Td1[(s3 >> 8) & 0xff] ^ Td2[(s2 >> 16) & 0xff] ^ Td3[(s1 >> 24) & 0xff] ^ ikeys[0];
-    t1 = Td0[s1 & 0xff] ^ Td1[(s0 >> 8) & 0xff] ^ Td2[(s3 >> 16) & 0xff] ^ Td3[(s2 >> 24) & 0xff] ^ ikeys[1];
-    t2 = Td0[s2 & 0xff] ^ Td1[(s1 >> 8) & 0xff] ^ Td2[(s0 >> 16) & 0xff] ^ Td3[(s3 >> 24) & 0xff] ^ ikeys[2];
-    t3 = Td0[s3 & 0xff] ^ Td1[(s2 >> 8) & 0xff] ^ Td2[(s1 >> 16) & 0xff] ^ Td3[(s0 >> 24) & 0xff] ^ ikeys[3];
+    t0 = Td0[byte0 (s0)] ^ Td1[byte1 (s3)] ^ Td2[byte2 (s2)] ^ Td3[byte3 (s1)] ^ ikeys[0];
+    t1 = Td0[byte0 (s1)] ^ Td1[byte1 (s0)] ^ Td2[byte2 (s3)] ^ Td3[byte3 (s2)] ^ ikeys[1];
+    t2 = Td0[byte0 (s2)] ^ Td1[byte1 (s1)] ^ Td2[byte2 (s0)] ^ Td3[byte3 (s3)] ^ ikeys[2];
+    t3 = Td0[byte0 (s3)] ^ Td1[byte1 (s2)] ^ Td2[byte2 (s1)] ^ Td3[byte3 (s0)] ^ ikeys[3];
 }
 
 static inline uint32_t
 subbyte_last (std::uint32_t const box[],
     std::uint32_t const t0, std::uint32_t const t1, std::uint32_t const t2, std::uint32_t const t3)
 {
-    return (box[(t0      ) & 0xff] & 0x000000ffUL)
-         ^ (box[(t1 >>  8) & 0xff] & 0x0000ff00UL)
-         ^ (box[(t2 >> 16) & 0xff] & 0x00ff0000UL)
-         ^ (box[(t3 >> 24) & 0xff] & 0xff000000UL);
+    return (box[byte0 (t0)] & 0x000000ffUL)
+         ^ (box[byte1 (t1)] & 0x0000ff00UL)
+         ^ (box[byte2 (t2)] & 0x00ff0000UL)
+         ^ (box[byte3 (t3)] & 0xff000000UL);
 }
 
 void
@@ -712,7 +733,7 @@ AES::schedule_encrypt_keys (int const nk, int const nr, std::uint32_t* rk)
     std::uint32_t rcon = 1U;
     for (int i = nk, j = 0; i < lastkey; ++i) {
         if (j == 0) {
-            rk[i] = rk[i - nk] ^ subbyterot (rk[i - 1]) ^ rcon;
+            rk[i] = rk[i - nk] ^ subbyte (rotbyte (rk[i - 1])) ^ rcon;
             rcon = (rcon << 1) ^ ((rcon & 0x80) ? 0x11b : 0);
         }
         else if (nk > 6 && j == 4) {
@@ -822,6 +843,77 @@ AES::decrypt (BLOCK const& secret, BLOCK& plain)
     pack32 (plain[ 8], plain[ 9], plain[10], plain[11], s2);
     pack32 (plain[12], plain[13], plain[14], plain[15], s3);
 }
+
+//  // generate SBOX, Te0..Te3, IBOX, Td0..Td3
+//  struct rijndael_table_generator {
+//      std::array<int,256> lntable;
+//      std::array<std::uint8_t,256> exptable;
+//      std::array<std::uint32_t,256> sbox, te0, te1, te2, te3;
+//      std::array<std::uint32_t,256> ibox, td0, td1, td2, td3;
+//
+//      void fill_table (void)
+//      {
+//          fill_mul_table ();
+//          for (int i = 0; i < 256; ++i) {
+//              std::uint8_t const p = i;
+//              std::uint8_t const q = inv (p);
+//              // Rijndael's affine transformation
+//              std::uint8_t s = 0x63 ^ q
+//                  ^ ((q << 1)|(q >> 7)) ^ ((q << 2)|(q >> 6))
+//                  ^ ((q << 3)|(q >> 5)) ^ ((q << 4)|(q >> 4));
+//  
+//              sbox[p] = unpack32 (s, s, s, s);
+//              te0[p] = unpack32 (mul (2, s), s, s, mul (3, s));
+//              te1[p] = unpack32 (mul (3, s), mul (2, s), s, s);
+//              te2[p] = unpack32 (s, mul (3, s), mul (2, s), s);
+//              te3[p] = unpack32 (s, s, mul (3, s), mul (2, s));
+//  
+//              ibox[s] = unpack32 (p, p, p, p);
+//              td0[s] = unpack32(mul (14, p), mul ( 9, p), mul (13, p), mul (11, p));
+//              td1[s] = unpack32(mul (11, p), mul (14, p), mul ( 9, p), mul (13, p));
+//              td2[s] = unpack32(mul (13, p), mul (11, p), mul (14, p), mul ( 9, p));
+//              td3[s] = unpack32(mul ( 9, p), mul (13, p), mul (11, p), mul (14, p));
+//          }
+//      }
+//
+//  private:
+//      std::uint32_t
+//      unpack32 (std::uint8_t const c0, std::uint8_t const c1,
+//                std::uint8_t const c2, std::uint8_t const c3)
+//      {
+//          return static_cast<std::uint32_t> (c0)
+//               | (static_cast<std::uint32_t> (c1) <<  8)
+//               | (static_cast<std::uint32_t> (c2) << 16)
+//               | (static_cast<std::uint32_t> (c3) << 24);
+//      }
+//
+//      std::uint8_t inv (std::uint8_t const a) const
+//      {
+//          return a == 0 ? 0 : exptable[255 - lntable[a]];
+//      }
+//
+//      std::uint8_t mul (std::uint8_t const a, std::uint8_t const b) const
+//      {
+//          if (a == 0 || b == 0)
+//              return 0;
+//          int e = lntable[a] + lntable[b];
+//          if (e >= 255)
+//              e -= 255;
+//          return exptable[e];
+//      }
+//
+//      void fill_mul_table (void)
+//      {
+//          std::uint8_t a = 1U;
+//          for (int e = 0; e < 255; ++e) {
+//              lntable[a] = e;
+//              exptable[e] = a;
+//              a = a ^ (a << 1) ^ (a & 0x80 ? 0x1b : 0);
+//          }
+//          lntable[0] = 0;
+//          exptable[255] = exptable[0];
+//      }
+//  };
 
 }//namespace cipher
 
