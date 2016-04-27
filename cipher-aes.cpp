@@ -10,9 +10,6 @@ using BLOCK = typename AES::BLOCK;
 
 //  SBOX[i] == unpack32(sbox[i], sbox[i], sbox[i], sbox[i])
 //   Te0[i] == unpack32(2*sbox[i], 1*sbox[i], 1*sbox[i], 3*sbox[i])
-//   Te1[i] == unpack32(3*sbox[i], 2*sbox[i], 1*sbox[i], 1*sbox[i])
-//   Te2[i] == unpack32(1*sbox[i], 3*sbox[i], 2*sbox[i], 1*sbox[i])
-//   Te3[i] == unpack32(1*sbox[i], 1*sbox[i], 3*sbox[i], 2*sbox[i])
 //  where C*sbox[i] means galois field multiplication of C and sbox[i].
 
 static const std::uint32_t SBOX[256] = {
@@ -125,176 +122,8 @@ static const std::uint32_t Te0[256] = {
     0x3a16162cUL,
 };
 
-static const std::uint32_t Te1[256] = {
-    0x6363c6a5UL, 0x7c7cf884UL, 0x7777ee99UL, 0x7b7bf68dUL, 0xf2f2ff0dUL,
-    0x6b6bd6bdUL, 0x6f6fdeb1UL, 0xc5c59154UL, 0x30306050UL, 0x01010203UL,
-    0x6767cea9UL, 0x2b2b567dUL, 0xfefee719UL, 0xd7d7b562UL, 0xabab4de6UL,
-    0x7676ec9aUL, 0xcaca8f45UL, 0x82821f9dUL, 0xc9c98940UL, 0x7d7dfa87UL,
-    0xfafaef15UL, 0x5959b2ebUL, 0x47478ec9UL, 0xf0f0fb0bUL, 0xadad41ecUL,
-    0xd4d4b367UL, 0xa2a25ffdUL, 0xafaf45eaUL, 0x9c9c23bfUL, 0xa4a453f7UL,
-    0x7272e496UL, 0xc0c09b5bUL, 0xb7b775c2UL, 0xfdfde11cUL, 0x93933daeUL,
-    0x26264c6aUL, 0x36366c5aUL, 0x3f3f7e41UL, 0xf7f7f502UL, 0xcccc834fUL,
-    0x3434685cUL, 0xa5a551f4UL, 0xe5e5d134UL, 0xf1f1f908UL, 0x7171e293UL,
-    0xd8d8ab73UL, 0x31316253UL, 0x15152a3fUL, 0x0404080cUL, 0xc7c79552UL,
-    0x23234665UL, 0xc3c39d5eUL, 0x18183028UL, 0x969637a1UL, 0x05050a0fUL,
-    0x9a9a2fb5UL, 0x07070e09UL, 0x12122436UL, 0x80801b9bUL, 0xe2e2df3dUL,
-    0xebebcd26UL, 0x27274e69UL, 0xb2b27fcdUL, 0x7575ea9fUL, 0x0909121bUL,
-    0x83831d9eUL, 0x2c2c5874UL, 0x1a1a342eUL, 0x1b1b362dUL, 0x6e6edcb2UL,
-    0x5a5ab4eeUL, 0xa0a05bfbUL, 0x5252a4f6UL, 0x3b3b764dUL, 0xd6d6b761UL,
-    0xb3b37dceUL, 0x2929527bUL, 0xe3e3dd3eUL, 0x2f2f5e71UL, 0x84841397UL,
-    0x5353a6f5UL, 0xd1d1b968UL, 0x00000000UL, 0xededc12cUL, 0x20204060UL,
-    0xfcfce31fUL, 0xb1b179c8UL, 0x5b5bb6edUL, 0x6a6ad4beUL, 0xcbcb8d46UL,
-    0xbebe67d9UL, 0x3939724bUL, 0x4a4a94deUL, 0x4c4c98d4UL, 0x5858b0e8UL,
-    0xcfcf854aUL, 0xd0d0bb6bUL, 0xefefc52aUL, 0xaaaa4fe5UL, 0xfbfbed16UL,
-    0x434386c5UL, 0x4d4d9ad7UL, 0x33336655UL, 0x85851194UL, 0x45458acfUL,
-    0xf9f9e910UL, 0x02020406UL, 0x7f7ffe81UL, 0x5050a0f0UL, 0x3c3c7844UL,
-    0x9f9f25baUL, 0xa8a84be3UL, 0x5151a2f3UL, 0xa3a35dfeUL, 0x404080c0UL,
-    0x8f8f058aUL, 0x92923fadUL, 0x9d9d21bcUL, 0x38387048UL, 0xf5f5f104UL,
-    0xbcbc63dfUL, 0xb6b677c1UL, 0xdadaaf75UL, 0x21214263UL, 0x10102030UL,
-    0xffffe51aUL, 0xf3f3fd0eUL, 0xd2d2bf6dUL, 0xcdcd814cUL, 0x0c0c1814UL,
-    0x13132635UL, 0xececc32fUL, 0x5f5fbee1UL, 0x979735a2UL, 0x444488ccUL,
-    0x17172e39UL, 0xc4c49357UL, 0xa7a755f2UL, 0x7e7efc82UL, 0x3d3d7a47UL,
-    0x6464c8acUL, 0x5d5dbae7UL, 0x1919322bUL, 0x7373e695UL, 0x6060c0a0UL,
-    0x81811998UL, 0x4f4f9ed1UL, 0xdcdca37fUL, 0x22224466UL, 0x2a2a547eUL,
-    0x90903babUL, 0x88880b83UL, 0x46468ccaUL, 0xeeeec729UL, 0xb8b86bd3UL,
-    0x1414283cUL, 0xdedea779UL, 0x5e5ebce2UL, 0x0b0b161dUL, 0xdbdbad76UL,
-    0xe0e0db3bUL, 0x32326456UL, 0x3a3a744eUL, 0x0a0a141eUL, 0x494992dbUL,
-    0x06060c0aUL, 0x2424486cUL, 0x5c5cb8e4UL, 0xc2c29f5dUL, 0xd3d3bd6eUL,
-    0xacac43efUL, 0x6262c4a6UL, 0x919139a8UL, 0x959531a4UL, 0xe4e4d337UL,
-    0x7979f28bUL, 0xe7e7d532UL, 0xc8c88b43UL, 0x37376e59UL, 0x6d6ddab7UL,
-    0x8d8d018cUL, 0xd5d5b164UL, 0x4e4e9cd2UL, 0xa9a949e0UL, 0x6c6cd8b4UL,
-    0x5656acfaUL, 0xf4f4f307UL, 0xeaeacf25UL, 0x6565caafUL, 0x7a7af48eUL,
-    0xaeae47e9UL, 0x08081018UL, 0xbaba6fd5UL, 0x7878f088UL, 0x25254a6fUL,
-    0x2e2e5c72UL, 0x1c1c3824UL, 0xa6a657f1UL, 0xb4b473c7UL, 0xc6c69751UL,
-    0xe8e8cb23UL, 0xdddda17cUL, 0x7474e89cUL, 0x1f1f3e21UL, 0x4b4b96ddUL,
-    0xbdbd61dcUL, 0x8b8b0d86UL, 0x8a8a0f85UL, 0x7070e090UL, 0x3e3e7c42UL,
-    0xb5b571c4UL, 0x6666ccaaUL, 0x484890d8UL, 0x03030605UL, 0xf6f6f701UL,
-    0x0e0e1c12UL, 0x6161c2a3UL, 0x35356a5fUL, 0x5757aef9UL, 0xb9b969d0UL,
-    0x86861791UL, 0xc1c19958UL, 0x1d1d3a27UL, 0x9e9e27b9UL, 0xe1e1d938UL,
-    0xf8f8eb13UL, 0x98982bb3UL, 0x11112233UL, 0x6969d2bbUL, 0xd9d9a970UL,
-    0x8e8e0789UL, 0x949433a7UL, 0x9b9b2db6UL, 0x1e1e3c22UL, 0x87871592UL,
-    0xe9e9c920UL, 0xcece8749UL, 0x5555aaffUL, 0x28285078UL, 0xdfdfa57aUL,
-    0x8c8c038fUL, 0xa1a159f8UL, 0x89890980UL, 0x0d0d1a17UL, 0xbfbf65daUL,
-    0xe6e6d731UL, 0x424284c6UL, 0x6868d0b8UL, 0x414182c3UL, 0x999929b0UL,
-    0x2d2d5a77UL, 0x0f0f1e11UL, 0xb0b07bcbUL, 0x5454a8fcUL, 0xbbbb6dd6UL,
-    0x16162c3aUL,
-};
-
-static const std::uint32_t Te2[256] = {
-    0x63c6a563UL, 0x7cf8847cUL, 0x77ee9977UL, 0x7bf68d7bUL, 0xf2ff0df2UL,
-    0x6bd6bd6bUL, 0x6fdeb16fUL, 0xc59154c5UL, 0x30605030UL, 0x01020301UL,
-    0x67cea967UL, 0x2b567d2bUL, 0xfee719feUL, 0xd7b562d7UL, 0xab4de6abUL,
-    0x76ec9a76UL, 0xca8f45caUL, 0x821f9d82UL, 0xc98940c9UL, 0x7dfa877dUL,
-    0xfaef15faUL, 0x59b2eb59UL, 0x478ec947UL, 0xf0fb0bf0UL, 0xad41ecadUL,
-    0xd4b367d4UL, 0xa25ffda2UL, 0xaf45eaafUL, 0x9c23bf9cUL, 0xa453f7a4UL,
-    0x72e49672UL, 0xc09b5bc0UL, 0xb775c2b7UL, 0xfde11cfdUL, 0x933dae93UL,
-    0x264c6a26UL, 0x366c5a36UL, 0x3f7e413fUL, 0xf7f502f7UL, 0xcc834fccUL,
-    0x34685c34UL, 0xa551f4a5UL, 0xe5d134e5UL, 0xf1f908f1UL, 0x71e29371UL,
-    0xd8ab73d8UL, 0x31625331UL, 0x152a3f15UL, 0x04080c04UL, 0xc79552c7UL,
-    0x23466523UL, 0xc39d5ec3UL, 0x18302818UL, 0x9637a196UL, 0x050a0f05UL,
-    0x9a2fb59aUL, 0x070e0907UL, 0x12243612UL, 0x801b9b80UL, 0xe2df3de2UL,
-    0xebcd26ebUL, 0x274e6927UL, 0xb27fcdb2UL, 0x75ea9f75UL, 0x09121b09UL,
-    0x831d9e83UL, 0x2c58742cUL, 0x1a342e1aUL, 0x1b362d1bUL, 0x6edcb26eUL,
-    0x5ab4ee5aUL, 0xa05bfba0UL, 0x52a4f652UL, 0x3b764d3bUL, 0xd6b761d6UL,
-    0xb37dceb3UL, 0x29527b29UL, 0xe3dd3ee3UL, 0x2f5e712fUL, 0x84139784UL,
-    0x53a6f553UL, 0xd1b968d1UL, 0x00000000UL, 0xedc12cedUL, 0x20406020UL,
-    0xfce31ffcUL, 0xb179c8b1UL, 0x5bb6ed5bUL, 0x6ad4be6aUL, 0xcb8d46cbUL,
-    0xbe67d9beUL, 0x39724b39UL, 0x4a94de4aUL, 0x4c98d44cUL, 0x58b0e858UL,
-    0xcf854acfUL, 0xd0bb6bd0UL, 0xefc52aefUL, 0xaa4fe5aaUL, 0xfbed16fbUL,
-    0x4386c543UL, 0x4d9ad74dUL, 0x33665533UL, 0x85119485UL, 0x458acf45UL,
-    0xf9e910f9UL, 0x02040602UL, 0x7ffe817fUL, 0x50a0f050UL, 0x3c78443cUL,
-    0x9f25ba9fUL, 0xa84be3a8UL, 0x51a2f351UL, 0xa35dfea3UL, 0x4080c040UL,
-    0x8f058a8fUL, 0x923fad92UL, 0x9d21bc9dUL, 0x38704838UL, 0xf5f104f5UL,
-    0xbc63dfbcUL, 0xb677c1b6UL, 0xdaaf75daUL, 0x21426321UL, 0x10203010UL,
-    0xffe51affUL, 0xf3fd0ef3UL, 0xd2bf6dd2UL, 0xcd814ccdUL, 0x0c18140cUL,
-    0x13263513UL, 0xecc32fecUL, 0x5fbee15fUL, 0x9735a297UL, 0x4488cc44UL,
-    0x172e3917UL, 0xc49357c4UL, 0xa755f2a7UL, 0x7efc827eUL, 0x3d7a473dUL,
-    0x64c8ac64UL, 0x5dbae75dUL, 0x19322b19UL, 0x73e69573UL, 0x60c0a060UL,
-    0x81199881UL, 0x4f9ed14fUL, 0xdca37fdcUL, 0x22446622UL, 0x2a547e2aUL,
-    0x903bab90UL, 0x880b8388UL, 0x468cca46UL, 0xeec729eeUL, 0xb86bd3b8UL,
-    0x14283c14UL, 0xdea779deUL, 0x5ebce25eUL, 0x0b161d0bUL, 0xdbad76dbUL,
-    0xe0db3be0UL, 0x32645632UL, 0x3a744e3aUL, 0x0a141e0aUL, 0x4992db49UL,
-    0x060c0a06UL, 0x24486c24UL, 0x5cb8e45cUL, 0xc29f5dc2UL, 0xd3bd6ed3UL,
-    0xac43efacUL, 0x62c4a662UL, 0x9139a891UL, 0x9531a495UL, 0xe4d337e4UL,
-    0x79f28b79UL, 0xe7d532e7UL, 0xc88b43c8UL, 0x376e5937UL, 0x6ddab76dUL,
-    0x8d018c8dUL, 0xd5b164d5UL, 0x4e9cd24eUL, 0xa949e0a9UL, 0x6cd8b46cUL,
-    0x56acfa56UL, 0xf4f307f4UL, 0xeacf25eaUL, 0x65caaf65UL, 0x7af48e7aUL,
-    0xae47e9aeUL, 0x08101808UL, 0xba6fd5baUL, 0x78f08878UL, 0x254a6f25UL,
-    0x2e5c722eUL, 0x1c38241cUL, 0xa657f1a6UL, 0xb473c7b4UL, 0xc69751c6UL,
-    0xe8cb23e8UL, 0xdda17cddUL, 0x74e89c74UL, 0x1f3e211fUL, 0x4b96dd4bUL,
-    0xbd61dcbdUL, 0x8b0d868bUL, 0x8a0f858aUL, 0x70e09070UL, 0x3e7c423eUL,
-    0xb571c4b5UL, 0x66ccaa66UL, 0x4890d848UL, 0x03060503UL, 0xf6f701f6UL,
-    0x0e1c120eUL, 0x61c2a361UL, 0x356a5f35UL, 0x57aef957UL, 0xb969d0b9UL,
-    0x86179186UL, 0xc19958c1UL, 0x1d3a271dUL, 0x9e27b99eUL, 0xe1d938e1UL,
-    0xf8eb13f8UL, 0x982bb398UL, 0x11223311UL, 0x69d2bb69UL, 0xd9a970d9UL,
-    0x8e07898eUL, 0x9433a794UL, 0x9b2db69bUL, 0x1e3c221eUL, 0x87159287UL,
-    0xe9c920e9UL, 0xce8749ceUL, 0x55aaff55UL, 0x28507828UL, 0xdfa57adfUL,
-    0x8c038f8cUL, 0xa159f8a1UL, 0x89098089UL, 0x0d1a170dUL, 0xbf65dabfUL,
-    0xe6d731e6UL, 0x4284c642UL, 0x68d0b868UL, 0x4182c341UL, 0x9929b099UL,
-    0x2d5a772dUL, 0x0f1e110fUL, 0xb07bcbb0UL, 0x54a8fc54UL, 0xbb6dd6bbUL,
-    0x162c3a16UL,
-};
-
-static const std::uint32_t Te3[256] = {
-    0xc6a56363UL, 0xf8847c7cUL, 0xee997777UL, 0xf68d7b7bUL, 0xff0df2f2UL,
-    0xd6bd6b6bUL, 0xdeb16f6fUL, 0x9154c5c5UL, 0x60503030UL, 0x02030101UL,
-    0xcea96767UL, 0x567d2b2bUL, 0xe719fefeUL, 0xb562d7d7UL, 0x4de6ababUL,
-    0xec9a7676UL, 0x8f45cacaUL, 0x1f9d8282UL, 0x8940c9c9UL, 0xfa877d7dUL,
-    0xef15fafaUL, 0xb2eb5959UL, 0x8ec94747UL, 0xfb0bf0f0UL, 0x41ecadadUL,
-    0xb367d4d4UL, 0x5ffda2a2UL, 0x45eaafafUL, 0x23bf9c9cUL, 0x53f7a4a4UL,
-    0xe4967272UL, 0x9b5bc0c0UL, 0x75c2b7b7UL, 0xe11cfdfdUL, 0x3dae9393UL,
-    0x4c6a2626UL, 0x6c5a3636UL, 0x7e413f3fUL, 0xf502f7f7UL, 0x834fccccUL,
-    0x685c3434UL, 0x51f4a5a5UL, 0xd134e5e5UL, 0xf908f1f1UL, 0xe2937171UL,
-    0xab73d8d8UL, 0x62533131UL, 0x2a3f1515UL, 0x080c0404UL, 0x9552c7c7UL,
-    0x46652323UL, 0x9d5ec3c3UL, 0x30281818UL, 0x37a19696UL, 0x0a0f0505UL,
-    0x2fb59a9aUL, 0x0e090707UL, 0x24361212UL, 0x1b9b8080UL, 0xdf3de2e2UL,
-    0xcd26ebebUL, 0x4e692727UL, 0x7fcdb2b2UL, 0xea9f7575UL, 0x121b0909UL,
-    0x1d9e8383UL, 0x58742c2cUL, 0x342e1a1aUL, 0x362d1b1bUL, 0xdcb26e6eUL,
-    0xb4ee5a5aUL, 0x5bfba0a0UL, 0xa4f65252UL, 0x764d3b3bUL, 0xb761d6d6UL,
-    0x7dceb3b3UL, 0x527b2929UL, 0xdd3ee3e3UL, 0x5e712f2fUL, 0x13978484UL,
-    0xa6f55353UL, 0xb968d1d1UL, 0x00000000UL, 0xc12cededUL, 0x40602020UL,
-    0xe31ffcfcUL, 0x79c8b1b1UL, 0xb6ed5b5bUL, 0xd4be6a6aUL, 0x8d46cbcbUL,
-    0x67d9bebeUL, 0x724b3939UL, 0x94de4a4aUL, 0x98d44c4cUL, 0xb0e85858UL,
-    0x854acfcfUL, 0xbb6bd0d0UL, 0xc52aefefUL, 0x4fe5aaaaUL, 0xed16fbfbUL,
-    0x86c54343UL, 0x9ad74d4dUL, 0x66553333UL, 0x11948585UL, 0x8acf4545UL,
-    0xe910f9f9UL, 0x04060202UL, 0xfe817f7fUL, 0xa0f05050UL, 0x78443c3cUL,
-    0x25ba9f9fUL, 0x4be3a8a8UL, 0xa2f35151UL, 0x5dfea3a3UL, 0x80c04040UL,
-    0x058a8f8fUL, 0x3fad9292UL, 0x21bc9d9dUL, 0x70483838UL, 0xf104f5f5UL,
-    0x63dfbcbcUL, 0x77c1b6b6UL, 0xaf75dadaUL, 0x42632121UL, 0x20301010UL,
-    0xe51affffUL, 0xfd0ef3f3UL, 0xbf6dd2d2UL, 0x814ccdcdUL, 0x18140c0cUL,
-    0x26351313UL, 0xc32fececUL, 0xbee15f5fUL, 0x35a29797UL, 0x88cc4444UL,
-    0x2e391717UL, 0x9357c4c4UL, 0x55f2a7a7UL, 0xfc827e7eUL, 0x7a473d3dUL,
-    0xc8ac6464UL, 0xbae75d5dUL, 0x322b1919UL, 0xe6957373UL, 0xc0a06060UL,
-    0x19988181UL, 0x9ed14f4fUL, 0xa37fdcdcUL, 0x44662222UL, 0x547e2a2aUL,
-    0x3bab9090UL, 0x0b838888UL, 0x8cca4646UL, 0xc729eeeeUL, 0x6bd3b8b8UL,
-    0x283c1414UL, 0xa779dedeUL, 0xbce25e5eUL, 0x161d0b0bUL, 0xad76dbdbUL,
-    0xdb3be0e0UL, 0x64563232UL, 0x744e3a3aUL, 0x141e0a0aUL, 0x92db4949UL,
-    0x0c0a0606UL, 0x486c2424UL, 0xb8e45c5cUL, 0x9f5dc2c2UL, 0xbd6ed3d3UL,
-    0x43efacacUL, 0xc4a66262UL, 0x39a89191UL, 0x31a49595UL, 0xd337e4e4UL,
-    0xf28b7979UL, 0xd532e7e7UL, 0x8b43c8c8UL, 0x6e593737UL, 0xdab76d6dUL,
-    0x018c8d8dUL, 0xb164d5d5UL, 0x9cd24e4eUL, 0x49e0a9a9UL, 0xd8b46c6cUL,
-    0xacfa5656UL, 0xf307f4f4UL, 0xcf25eaeaUL, 0xcaaf6565UL, 0xf48e7a7aUL,
-    0x47e9aeaeUL, 0x10180808UL, 0x6fd5babaUL, 0xf0887878UL, 0x4a6f2525UL,
-    0x5c722e2eUL, 0x38241c1cUL, 0x57f1a6a6UL, 0x73c7b4b4UL, 0x9751c6c6UL,
-    0xcb23e8e8UL, 0xa17cddddUL, 0xe89c7474UL, 0x3e211f1fUL, 0x96dd4b4bUL,
-    0x61dcbdbdUL, 0x0d868b8bUL, 0x0f858a8aUL, 0xe0907070UL, 0x7c423e3eUL,
-    0x71c4b5b5UL, 0xccaa6666UL, 0x90d84848UL, 0x06050303UL, 0xf701f6f6UL,
-    0x1c120e0eUL, 0xc2a36161UL, 0x6a5f3535UL, 0xaef95757UL, 0x69d0b9b9UL,
-    0x17918686UL, 0x9958c1c1UL, 0x3a271d1dUL, 0x27b99e9eUL, 0xd938e1e1UL,
-    0xeb13f8f8UL, 0x2bb39898UL, 0x22331111UL, 0xd2bb6969UL, 0xa970d9d9UL,
-    0x07898e8eUL, 0x33a79494UL, 0x2db69b9bUL, 0x3c221e1eUL, 0x15928787UL,
-    0xc920e9e9UL, 0x8749ceceUL, 0xaaff5555UL, 0x50782828UL, 0xa57adfdfUL,
-    0x038f8c8cUL, 0x59f8a1a1UL, 0x09808989UL, 0x1a170d0dUL, 0x65dabfbfUL,
-    0xd731e6e6UL, 0x84c64242UL, 0xd0b86868UL, 0x82c34141UL, 0x29b09999UL,
-    0x5a772d2dUL, 0x1e110f0fUL, 0x7bcbb0b0UL, 0xa8fc5454UL, 0x6dd6bbbbUL,
-    0x2c3a1616UL,
-};
-
 //  IBOX[i] == unpack32(ibox[i], ibox[i], ibox[i], ibox[i])
 //   Td0[i] == unpack32(14*ibox[i],  9*ibox[i], 13*ibox[i], 11*ibox[i])
-//   Td1[i] == unpack32(11*ibox[i], 14*ibox[i],  9*ibox[i], 13*ibox[i])
-//   Td2[i] == unpack32(13*ibox[i], 11*ibox[i], 14*ibox[i],  9*ibox[i])
-//   Td3[i] == unpack32( 9*ibox[i], 13*ibox[i], 11*ibox[i], 14*ibox[i])
 //  where C*isbox[i] means galois field multiplication of C and isbox[i].
 
 static const std::uint32_t IBOX[256] = {
@@ -407,175 +236,16 @@ static const std::uint32_t Td0[256] = {
     0x4257b8d0UL,
 };
 
-static const std::uint32_t Td1[256] = {
-    0xa7f45150UL, 0x65417e53UL, 0xa4171ac3UL, 0x5e273a96UL, 0x6bab3bcbUL,
-    0x459d1ff1UL, 0x58faacabUL, 0x03e34b93UL, 0xfa302055UL, 0x6d76adf6UL,
-    0x76cc8891UL, 0x4c02f525UL, 0xd7e54ffcUL, 0xcb2ac5d7UL, 0x44352680UL,
-    0xa362b58fUL, 0x5ab1de49UL, 0x1bba2567UL, 0x0eea4598UL, 0xc0fe5de1UL,
-    0x752fc302UL, 0xf04c8112UL, 0x97468da3UL, 0xf9d36bc6UL, 0x5f8f03e7UL,
-    0x9c921595UL, 0x7a6dbfebUL, 0x595295daUL, 0x83bed42dUL, 0x217458d3UL,
-    0x69e04929UL, 0xc8c98e44UL, 0x89c2756aUL, 0x798ef478UL, 0x3e58996bUL,
-    0x71b927ddUL, 0x4fe1beb6UL, 0xad88f017UL, 0xac20c966UL, 0x3ace7db4UL,
-    0x4adf6318UL, 0x311ae582UL, 0x33519760UL, 0x7f536245UL, 0x7764b1e0UL,
-    0xae6bbb84UL, 0xa081fe1cUL, 0x2b08f994UL, 0x68487058UL, 0xfd458f19UL,
-    0x6cde9487UL, 0xf87b52b7UL, 0xd373ab23UL, 0x024b72e2UL, 0x8f1fe357UL,
-    0xab55662aUL, 0x28ebb207UL, 0xc2b52f03UL, 0x7bc5869aUL, 0x0837d3a5UL,
-    0x872830f2UL, 0xa5bf23b2UL, 0x6a0302baUL, 0x8216ed5cUL, 0x1ccf8a2bUL,
-    0xb479a792UL, 0xf207f3f0UL, 0xe2694ea1UL, 0xf4da65cdUL, 0xbe0506d5UL,
-    0x6234d11fUL, 0xfea6c48aUL, 0x532e349dUL, 0x55f3a2a0UL, 0xe18a0532UL,
-    0xebf6a475UL, 0xec830b39UL, 0xef6040aaUL, 0x9f715e06UL, 0x106ebd51UL,
-    0x8a213ef9UL, 0x06dd963dUL, 0x053eddaeUL, 0xbde64d46UL, 0x8d5491b5UL,
-    0x5dc47105UL, 0xd406046fUL, 0x155060ffUL, 0xfb981924UL, 0xe9bdd697UL,
-    0x434089ccUL, 0x9ed96777UL, 0x42e8b0bdUL, 0x8b890788UL, 0x5b19e738UL,
-    0xeec879dbUL, 0x0a7ca147UL, 0x0f427ce9UL, 0x1e84f8c9UL, 0x00000000UL,
-    0x86800983UL, 0xed2b3248UL, 0x70111eacUL, 0x725a6c4eUL, 0xff0efdfbUL,
-    0x38850f56UL, 0xd5ae3d1eUL, 0x392d3627UL, 0xd90f0a64UL, 0xa65c6821UL,
-    0x545b9bd1UL, 0x2e36243aUL, 0x670a0cb1UL, 0xe757930fUL, 0x96eeb4d2UL,
-    0x919b1b9eUL, 0xc5c0804fUL, 0x20dc61a2UL, 0x4b775a69UL, 0x1a121c16UL,
-    0xba93e20aUL, 0x2aa0c0e5UL, 0xe0223c43UL, 0x171b121dUL, 0x0d090e0bUL,
-    0xc78bf2adUL, 0xa8b62db9UL, 0xa91e14c8UL, 0x19f15785UL, 0x0775af4cUL,
-    0xdd99eebbUL, 0x607fa3fdUL, 0x2601f79fUL, 0xf5725cbcUL, 0x3b6644c5UL,
-    0x7efb5b34UL, 0x29438b76UL, 0xc623cbdcUL, 0xfcedb668UL, 0xf1e4b863UL,
-    0xdc31d7caUL, 0x85634210UL, 0x22971340UL, 0x11c68420UL, 0x244a857dUL,
-    0x3dbbd2f8UL, 0x32f9ae11UL, 0xa129c76dUL, 0x2f9e1d4bUL, 0x30b2dcf3UL,
-    0x52860decUL, 0xe3c177d0UL, 0x16b32b6cUL, 0xb970a999UL, 0x489411faUL,
-    0x64e94722UL, 0x8cfca8c4UL, 0x3ff0a01aUL, 0x2c7d56d8UL, 0x903322efUL,
-    0x4e4987c7UL, 0xd138d9c1UL, 0xa2ca8cfeUL, 0x0bd49836UL, 0x81f5a6cfUL,
-    0xde7aa528UL, 0x8eb7da26UL, 0xbfad3fa4UL, 0x9d3a2ce4UL, 0x9278500dUL,
-    0xcc5f6a9bUL, 0x467e5462UL, 0x138df6c2UL, 0xb8d890e8UL, 0xf7392e5eUL,
-    0xafc382f5UL, 0x805d9fbeUL, 0x93d0697cUL, 0x2dd56fa9UL, 0x1225cfb3UL,
-    0x99acc83bUL, 0x7d1810a7UL, 0x639ce86eUL, 0xbb3bdb7bUL, 0x7826cd09UL,
-    0x18596ef4UL, 0xb79aec01UL, 0x9a4f83a8UL, 0x6e95e665UL, 0xe6ffaa7eUL,
-    0xcfbc2108UL, 0xe815efe6UL, 0x9be7bad9UL, 0x366f4aceUL, 0x099fead4UL,
-    0x7cb029d6UL, 0xb2a431afUL, 0x233f2a31UL, 0x94a5c630UL, 0x66a235c0UL,
-    0xbc4e7437UL, 0xca82fca6UL, 0xd090e0b0UL, 0xd8a73315UL, 0x9804f14aUL,
-    0xdaec41f7UL, 0x50cd7f0eUL, 0xf691172fUL, 0xd64d768dUL, 0xb0ef434dUL,
-    0x4daacc54UL, 0x0496e4dfUL, 0xb5d19ee3UL, 0x886a4c1bUL, 0x1f2cc1b8UL,
-    0x5165467fUL, 0xea5e9d04UL, 0x358c015dUL, 0x7487fa73UL, 0x410bfb2eUL,
-    0x1d67b35aUL, 0xd2db9252UL, 0x5610e933UL, 0x47d66d13UL, 0x61d79a8cUL,
-    0x0ca1377aUL, 0x14f8598eUL, 0x3c13eb89UL, 0x27a9ceeeUL, 0xc961b735UL,
-    0xe51ce1edUL, 0xb1477a3cUL, 0xdfd29c59UL, 0x73f2553fUL, 0xce141879UL,
-    0x37c773bfUL, 0xcdf753eaUL, 0xaafd5f5bUL, 0x6f3ddf14UL, 0xdb447886UL,
-    0xf3afca81UL, 0xc468b93eUL, 0x3424382cUL, 0x40a3c25fUL, 0xc31d1672UL,
-    0x25e2bc0cUL, 0x493c288bUL, 0x950dff41UL, 0x01a83971UL, 0xb30c08deUL,
-    0xe4b4d89cUL, 0xc1566490UL, 0x84cb7b61UL, 0xb632d570UL, 0x5c6c4874UL,
-    0x57b8d042UL,
-};
-
-static const std::uint32_t Td2[256] = {
-    0xf45150a7UL, 0x417e5365UL, 0x171ac3a4UL, 0x273a965eUL, 0xab3bcb6bUL,
-    0x9d1ff145UL, 0xfaacab58UL, 0xe34b9303UL, 0x302055faUL, 0x76adf66dUL,
-    0xcc889176UL, 0x02f5254cUL, 0xe54ffcd7UL, 0x2ac5d7cbUL, 0x35268044UL,
-    0x62b58fa3UL, 0xb1de495aUL, 0xba25671bUL, 0xea45980eUL, 0xfe5de1c0UL,
-    0x2fc30275UL, 0x4c8112f0UL, 0x468da397UL, 0xd36bc6f9UL, 0x8f03e75fUL,
-    0x9215959cUL, 0x6dbfeb7aUL, 0x5295da59UL, 0xbed42d83UL, 0x7458d321UL,
-    0xe0492969UL, 0xc98e44c8UL, 0xc2756a89UL, 0x8ef47879UL, 0x58996b3eUL,
-    0xb927dd71UL, 0xe1beb64fUL, 0x88f017adUL, 0x20c966acUL, 0xce7db43aUL,
-    0xdf63184aUL, 0x1ae58231UL, 0x51976033UL, 0x5362457fUL, 0x64b1e077UL,
-    0x6bbb84aeUL, 0x81fe1ca0UL, 0x08f9942bUL, 0x48705868UL, 0x458f19fdUL,
-    0xde94876cUL, 0x7b52b7f8UL, 0x73ab23d3UL, 0x4b72e202UL, 0x1fe3578fUL,
-    0x55662aabUL, 0xebb20728UL, 0xb52f03c2UL, 0xc5869a7bUL, 0x37d3a508UL,
-    0x2830f287UL, 0xbf23b2a5UL, 0x0302ba6aUL, 0x16ed5c82UL, 0xcf8a2b1cUL,
-    0x79a792b4UL, 0x07f3f0f2UL, 0x694ea1e2UL, 0xda65cdf4UL, 0x0506d5beUL,
-    0x34d11f62UL, 0xa6c48afeUL, 0x2e349d53UL, 0xf3a2a055UL, 0x8a0532e1UL,
-    0xf6a475ebUL, 0x830b39ecUL, 0x6040aaefUL, 0x715e069fUL, 0x6ebd5110UL,
-    0x213ef98aUL, 0xdd963d06UL, 0x3eddae05UL, 0xe64d46bdUL, 0x5491b58dUL,
-    0xc471055dUL, 0x06046fd4UL, 0x5060ff15UL, 0x981924fbUL, 0xbdd697e9UL,
-    0x4089cc43UL, 0xd967779eUL, 0xe8b0bd42UL, 0x8907888bUL, 0x19e7385bUL,
-    0xc879dbeeUL, 0x7ca1470aUL, 0x427ce90fUL, 0x84f8c91eUL, 0x00000000UL,
-    0x80098386UL, 0x2b3248edUL, 0x111eac70UL, 0x5a6c4e72UL, 0x0efdfbffUL,
-    0x850f5638UL, 0xae3d1ed5UL, 0x2d362739UL, 0x0f0a64d9UL, 0x5c6821a6UL,
-    0x5b9bd154UL, 0x36243a2eUL, 0x0a0cb167UL, 0x57930fe7UL, 0xeeb4d296UL,
-    0x9b1b9e91UL, 0xc0804fc5UL, 0xdc61a220UL, 0x775a694bUL, 0x121c161aUL,
-    0x93e20abaUL, 0xa0c0e52aUL, 0x223c43e0UL, 0x1b121d17UL, 0x090e0b0dUL,
-    0x8bf2adc7UL, 0xb62db9a8UL, 0x1e14c8a9UL, 0xf1578519UL, 0x75af4c07UL,
-    0x99eebbddUL, 0x7fa3fd60UL, 0x01f79f26UL, 0x725cbcf5UL, 0x6644c53bUL,
-    0xfb5b347eUL, 0x438b7629UL, 0x23cbdcc6UL, 0xedb668fcUL, 0xe4b863f1UL,
-    0x31d7cadcUL, 0x63421085UL, 0x97134022UL, 0xc6842011UL, 0x4a857d24UL,
-    0xbbd2f83dUL, 0xf9ae1132UL, 0x29c76da1UL, 0x9e1d4b2fUL, 0xb2dcf330UL,
-    0x860dec52UL, 0xc177d0e3UL, 0xb32b6c16UL, 0x70a999b9UL, 0x9411fa48UL,
-    0xe9472264UL, 0xfca8c48cUL, 0xf0a01a3fUL, 0x7d56d82cUL, 0x3322ef90UL,
-    0x4987c74eUL, 0x38d9c1d1UL, 0xca8cfea2UL, 0xd498360bUL, 0xf5a6cf81UL,
-    0x7aa528deUL, 0xb7da268eUL, 0xad3fa4bfUL, 0x3a2ce49dUL, 0x78500d92UL,
-    0x5f6a9bccUL, 0x7e546246UL, 0x8df6c213UL, 0xd890e8b8UL, 0x392e5ef7UL,
-    0xc382f5afUL, 0x5d9fbe80UL, 0xd0697c93UL, 0xd56fa92dUL, 0x25cfb312UL,
-    0xacc83b99UL, 0x1810a77dUL, 0x9ce86e63UL, 0x3bdb7bbbUL, 0x26cd0978UL,
-    0x596ef418UL, 0x9aec01b7UL, 0x4f83a89aUL, 0x95e6656eUL, 0xffaa7ee6UL,
-    0xbc2108cfUL, 0x15efe6e8UL, 0xe7bad99bUL, 0x6f4ace36UL, 0x9fead409UL,
-    0xb029d67cUL, 0xa431afb2UL, 0x3f2a3123UL, 0xa5c63094UL, 0xa235c066UL,
-    0x4e7437bcUL, 0x82fca6caUL, 0x90e0b0d0UL, 0xa73315d8UL, 0x04f14a98UL,
-    0xec41f7daUL, 0xcd7f0e50UL, 0x91172ff6UL, 0x4d768dd6UL, 0xef434db0UL,
-    0xaacc544dUL, 0x96e4df04UL, 0xd19ee3b5UL, 0x6a4c1b88UL, 0x2cc1b81fUL,
-    0x65467f51UL, 0x5e9d04eaUL, 0x8c015d35UL, 0x87fa7374UL, 0x0bfb2e41UL,
-    0x67b35a1dUL, 0xdb9252d2UL, 0x10e93356UL, 0xd66d1347UL, 0xd79a8c61UL,
-    0xa1377a0cUL, 0xf8598e14UL, 0x13eb893cUL, 0xa9ceee27UL, 0x61b735c9UL,
-    0x1ce1ede5UL, 0x477a3cb1UL, 0xd29c59dfUL, 0xf2553f73UL, 0x141879ceUL,
-    0xc773bf37UL, 0xf753eacdUL, 0xfd5f5baaUL, 0x3ddf146fUL, 0x447886dbUL,
-    0xafca81f3UL, 0x68b93ec4UL, 0x24382c34UL, 0xa3c25f40UL, 0x1d1672c3UL,
-    0xe2bc0c25UL, 0x3c288b49UL, 0x0dff4195UL, 0xa8397101UL, 0x0c08deb3UL,
-    0xb4d89ce4UL, 0x566490c1UL, 0xcb7b6184UL, 0x32d570b6UL, 0x6c48745cUL,
-    0xb8d04257UL,
-};
-
-static const std::uint32_t Td3[256] = {
-    0x5150a7f4UL, 0x7e536541UL, 0x1ac3a417UL, 0x3a965e27UL, 0x3bcb6babUL,
-    0x1ff1459dUL, 0xacab58faUL, 0x4b9303e3UL, 0x2055fa30UL, 0xadf66d76UL,
-    0x889176ccUL, 0xf5254c02UL, 0x4ffcd7e5UL, 0xc5d7cb2aUL, 0x26804435UL,
-    0xb58fa362UL, 0xde495ab1UL, 0x25671bbaUL, 0x45980eeaUL, 0x5de1c0feUL,
-    0xc302752fUL, 0x8112f04cUL, 0x8da39746UL, 0x6bc6f9d3UL, 0x03e75f8fUL,
-    0x15959c92UL, 0xbfeb7a6dUL, 0x95da5952UL, 0xd42d83beUL, 0x58d32174UL,
-    0x492969e0UL, 0x8e44c8c9UL, 0x756a89c2UL, 0xf478798eUL, 0x996b3e58UL,
-    0x27dd71b9UL, 0xbeb64fe1UL, 0xf017ad88UL, 0xc966ac20UL, 0x7db43aceUL,
-    0x63184adfUL, 0xe582311aUL, 0x97603351UL, 0x62457f53UL, 0xb1e07764UL,
-    0xbb84ae6bUL, 0xfe1ca081UL, 0xf9942b08UL, 0x70586848UL, 0x8f19fd45UL,
-    0x94876cdeUL, 0x52b7f87bUL, 0xab23d373UL, 0x72e2024bUL, 0xe3578f1fUL,
-    0x662aab55UL, 0xb20728ebUL, 0x2f03c2b5UL, 0x869a7bc5UL, 0xd3a50837UL,
-    0x30f28728UL, 0x23b2a5bfUL, 0x02ba6a03UL, 0xed5c8216UL, 0x8a2b1ccfUL,
-    0xa792b479UL, 0xf3f0f207UL, 0x4ea1e269UL, 0x65cdf4daUL, 0x06d5be05UL,
-    0xd11f6234UL, 0xc48afea6UL, 0x349d532eUL, 0xa2a055f3UL, 0x0532e18aUL,
-    0xa475ebf6UL, 0x0b39ec83UL, 0x40aaef60UL, 0x5e069f71UL, 0xbd51106eUL,
-    0x3ef98a21UL, 0x963d06ddUL, 0xddae053eUL, 0x4d46bde6UL, 0x91b58d54UL,
-    0x71055dc4UL, 0x046fd406UL, 0x60ff1550UL, 0x1924fb98UL, 0xd697e9bdUL,
-    0x89cc4340UL, 0x67779ed9UL, 0xb0bd42e8UL, 0x07888b89UL, 0xe7385b19UL,
-    0x79dbeec8UL, 0xa1470a7cUL, 0x7ce90f42UL, 0xf8c91e84UL, 0x00000000UL,
-    0x09838680UL, 0x3248ed2bUL, 0x1eac7011UL, 0x6c4e725aUL, 0xfdfbff0eUL,
-    0x0f563885UL, 0x3d1ed5aeUL, 0x3627392dUL, 0x0a64d90fUL, 0x6821a65cUL,
-    0x9bd1545bUL, 0x243a2e36UL, 0x0cb1670aUL, 0x930fe757UL, 0xb4d296eeUL,
-    0x1b9e919bUL, 0x804fc5c0UL, 0x61a220dcUL, 0x5a694b77UL, 0x1c161a12UL,
-    0xe20aba93UL, 0xc0e52aa0UL, 0x3c43e022UL, 0x121d171bUL, 0x0e0b0d09UL,
-    0xf2adc78bUL, 0x2db9a8b6UL, 0x14c8a91eUL, 0x578519f1UL, 0xaf4c0775UL,
-    0xeebbdd99UL, 0xa3fd607fUL, 0xf79f2601UL, 0x5cbcf572UL, 0x44c53b66UL,
-    0x5b347efbUL, 0x8b762943UL, 0xcbdcc623UL, 0xb668fcedUL, 0xb863f1e4UL,
-    0xd7cadc31UL, 0x42108563UL, 0x13402297UL, 0x842011c6UL, 0x857d244aUL,
-    0xd2f83dbbUL, 0xae1132f9UL, 0xc76da129UL, 0x1d4b2f9eUL, 0xdcf330b2UL,
-    0x0dec5286UL, 0x77d0e3c1UL, 0x2b6c16b3UL, 0xa999b970UL, 0x11fa4894UL,
-    0x472264e9UL, 0xa8c48cfcUL, 0xa01a3ff0UL, 0x56d82c7dUL, 0x22ef9033UL,
-    0x87c74e49UL, 0xd9c1d138UL, 0x8cfea2caUL, 0x98360bd4UL, 0xa6cf81f5UL,
-    0xa528de7aUL, 0xda268eb7UL, 0x3fa4bfadUL, 0x2ce49d3aUL, 0x500d9278UL,
-    0x6a9bcc5fUL, 0x5462467eUL, 0xf6c2138dUL, 0x90e8b8d8UL, 0x2e5ef739UL,
-    0x82f5afc3UL, 0x9fbe805dUL, 0x697c93d0UL, 0x6fa92dd5UL, 0xcfb31225UL,
-    0xc83b99acUL, 0x10a77d18UL, 0xe86e639cUL, 0xdb7bbb3bUL, 0xcd097826UL,
-    0x6ef41859UL, 0xec01b79aUL, 0x83a89a4fUL, 0xe6656e95UL, 0xaa7ee6ffUL,
-    0x2108cfbcUL, 0xefe6e815UL, 0xbad99be7UL, 0x4ace366fUL, 0xead4099fUL,
-    0x29d67cb0UL, 0x31afb2a4UL, 0x2a31233fUL, 0xc63094a5UL, 0x35c066a2UL,
-    0x7437bc4eUL, 0xfca6ca82UL, 0xe0b0d090UL, 0x3315d8a7UL, 0xf14a9804UL,
-    0x41f7daecUL, 0x7f0e50cdUL, 0x172ff691UL, 0x768dd64dUL, 0x434db0efUL,
-    0xcc544daaUL, 0xe4df0496UL, 0x9ee3b5d1UL, 0x4c1b886aUL, 0xc1b81f2cUL,
-    0x467f5165UL, 0x9d04ea5eUL, 0x015d358cUL, 0xfa737487UL, 0xfb2e410bUL,
-    0xb35a1d67UL, 0x9252d2dbUL, 0xe9335610UL, 0x6d1347d6UL, 0x9a8c61d7UL,
-    0x377a0ca1UL, 0x598e14f8UL, 0xeb893c13UL, 0xceee27a9UL, 0xb735c961UL,
-    0xe1ede51cUL, 0x7a3cb147UL, 0x9c59dfd2UL, 0x553f73f2UL, 0x1879ce14UL,
-    0x73bf37c7UL, 0x53eacdf7UL, 0x5f5baafdUL, 0xdf146f3dUL, 0x7886db44UL,
-    0xca81f3afUL, 0xb93ec468UL, 0x382c3424UL, 0xc25f40a3UL, 0x1672c31dUL,
-    0xbc0c25e2UL, 0x288b493cUL, 0xff41950dUL, 0x397101a8UL, 0x08deb30cUL,
-    0xd89ce4b4UL, 0x6490c156UL, 0x7b6184cbUL, 0xd570b632UL, 0x48745c6cUL,
-    0xd04257b8UL,
-};
-
 static inline uint32_t
-rotbyte (std::uint32_t const a)
+rolbyte (std::uint32_t const a)
 {
     return (a << 24) | (a >> 8);
+}
+
+static inline std::uint32_t
+rorbyte (std::uint32_t const a)
+{
+    return (a << 8) | (a >> 24);
 }
 
 static inline std::uint8_t
@@ -623,21 +293,28 @@ pack32 (std::uint8_t& c0, std::uint8_t& c1,
 }
 
 static inline uint32_t
-subbyte (std::uint32_t const a)
+subbyte (std::uint32_t const box[],
+    std::uint32_t const t0, std::uint32_t const t1, std::uint32_t const t2, std::uint32_t const t3)
 {
-    return (SBOX[byte0 (a)] & 0x000000ffUL)
-         ^ (SBOX[byte1 (a)] & 0x0000ff00UL)
-         ^ (SBOX[byte2 (a)] & 0x00ff0000UL)
-         ^ (SBOX[byte3 (a)] & 0xff000000UL);
+    return (box[byte0 (t0)] & 0x000000ffUL)
+         ^ (box[byte1 (t1)] & 0x0000ff00UL)
+         ^ (box[byte2 (t2)] & 0x00ff0000UL)
+         ^ (box[byte3 (t3)] & 0xff000000UL);
+}
+
+static inline uint32_t
+subbyte (std::uint32_t const box[], std::uint32_t const a)
+{
+    return subbyte (box, a, a, a, a);
 }
 
 static inline uint32_t
 inv_mix_column (std::uint32_t const a)
 {
     return Td0[SBOX[byte0 (a)] & 0xff]
-         ^ Td1[SBOX[byte1 (a)] & 0xff]
-         ^ Td2[SBOX[byte2 (a)] & 0xff]
-         ^ Td3[SBOX[byte3 (a)] & 0xff];
+            ^ rorbyte (Td0[SBOX[byte1 (a)] & 0xff]
+                ^ rorbyte (Td0[SBOX[byte2 (a)] & 0xff]
+                    ^ rorbyte (Td0[SBOX[byte3 (a)] & 0xff])));
 }
 
 static inline void
@@ -645,10 +322,10 @@ enround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
     std::uint32_t const *keys)
 {
-    t0 = Te0[byte0 (s0)] ^ Te1[byte1 (s1)] ^ Te2[byte2 (s2)] ^ Te3[byte3 (s3)] ^ keys[0];
-    t1 = Te0[byte0 (s1)] ^ Te1[byte1 (s2)] ^ Te2[byte2 (s3)] ^ Te3[byte3 (s0)] ^ keys[1];
-    t2 = Te0[byte0 (s2)] ^ Te1[byte1 (s3)] ^ Te2[byte2 (s0)] ^ Te3[byte3 (s1)] ^ keys[2];
-    t3 = Te0[byte0 (s3)] ^ Te1[byte1 (s0)] ^ Te2[byte2 (s1)] ^ Te3[byte3 (s2)] ^ keys[3];
+    t0 = Te0[byte0 (s0)] ^ rorbyte (Te0[byte1 (s1)] ^ rorbyte (Te0[byte2 (s2)] ^ rorbyte (Te0[byte3 (s3)]))) ^ keys[0];
+    t1 = Te0[byte0 (s1)] ^ rorbyte (Te0[byte1 (s2)] ^ rorbyte (Te0[byte2 (s3)] ^ rorbyte (Te0[byte3 (s0)]))) ^ keys[1];
+    t2 = Te0[byte0 (s2)] ^ rorbyte (Te0[byte1 (s3)] ^ rorbyte (Te0[byte2 (s0)] ^ rorbyte (Te0[byte3 (s1)]))) ^ keys[2];
+    t3 = Te0[byte0 (s3)] ^ rorbyte (Te0[byte1 (s0)] ^ rorbyte (Te0[byte2 (s1)] ^ rorbyte (Te0[byte3 (s2)]))) ^ keys[3];
 }
 
 static inline void
@@ -656,20 +333,10 @@ deround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
     std::uint32_t const *ikeys)
 {
-    t0 = Td0[byte0 (s0)] ^ Td1[byte1 (s3)] ^ Td2[byte2 (s2)] ^ Td3[byte3 (s1)] ^ ikeys[0];
-    t1 = Td0[byte0 (s1)] ^ Td1[byte1 (s0)] ^ Td2[byte2 (s3)] ^ Td3[byte3 (s2)] ^ ikeys[1];
-    t2 = Td0[byte0 (s2)] ^ Td1[byte1 (s1)] ^ Td2[byte2 (s0)] ^ Td3[byte3 (s3)] ^ ikeys[2];
-    t3 = Td0[byte0 (s3)] ^ Td1[byte1 (s2)] ^ Td2[byte2 (s1)] ^ Td3[byte3 (s0)] ^ ikeys[3];
-}
-
-static inline uint32_t
-subbyte_last (std::uint32_t const box[],
-    std::uint32_t const t0, std::uint32_t const t1, std::uint32_t const t2, std::uint32_t const t3)
-{
-    return (box[byte0 (t0)] & 0x000000ffUL)
-         ^ (box[byte1 (t1)] & 0x0000ff00UL)
-         ^ (box[byte2 (t2)] & 0x00ff0000UL)
-         ^ (box[byte3 (t3)] & 0xff000000UL);
+    t0 = Td0[byte0 (s0)] ^ rorbyte (Td0[byte1 (s3)] ^ rorbyte (Td0[byte2 (s2)] ^ rorbyte (Td0[byte3 (s1)]))) ^ ikeys[0];
+    t1 = Td0[byte0 (s1)] ^ rorbyte (Td0[byte1 (s0)] ^ rorbyte (Td0[byte2 (s3)] ^ rorbyte (Td0[byte3 (s2)]))) ^ ikeys[1];
+    t2 = Td0[byte0 (s2)] ^ rorbyte (Td0[byte1 (s1)] ^ rorbyte (Td0[byte2 (s0)] ^ rorbyte (Td0[byte3 (s3)]))) ^ ikeys[2];
+    t3 = Td0[byte0 (s3)] ^ rorbyte (Td0[byte1 (s2)] ^ rorbyte (Td0[byte2 (s1)] ^ rorbyte (Td0[byte3 (s0)]))) ^ ikeys[3];
 }
 
 void
@@ -733,11 +400,11 @@ AES::schedule_encrypt_keys (int const nk, int const nr, std::uint32_t* rk)
     std::uint32_t rcon = 1U;
     for (int i = nk, j = 0; i < lastkey; ++i) {
         if (j == 0) {
-            rk[i] = rk[i - nk] ^ subbyte (rotbyte (rk[i - 1])) ^ rcon;
+            rk[i] = rk[i - nk] ^ subbyte (SBOX, rolbyte (rk[i - 1])) ^ rcon;
             rcon = (rcon << 1) ^ ((rcon & 0x80) ? 0x11b : 0);
         }
         else if (nk > 6 && j == 4) {
-            rk[i] = rk[i - nk] ^ subbyte (rk[i - 1]);
+            rk[i] = rk[i - nk] ^ subbyte (SBOX, rk[i - 1]);
         }
         else {
             rk[i] = rk[i - nk] ^ rk[i - 1];
@@ -794,10 +461,10 @@ AES::encrypt (BLOCK const& plain, BLOCK& secret)
         }
     }
     int rk = nrounds << 2;
-    s0 = subbyte_last (SBOX, t0, t1, t2, t3) ^ keys[rk];
-    s1 = subbyte_last (SBOX, t1, t2, t3, t0) ^ keys[rk + 1];
-    s2 = subbyte_last (SBOX, t2, t3, t0, t1) ^ keys[rk + 2];
-    s3 = subbyte_last (SBOX, t3, t0, t1, t2) ^ keys[rk + 3];
+    s0 = subbyte (SBOX, t0, t1, t2, t3) ^ keys[rk];
+    s1 = subbyte (SBOX, t1, t2, t3, t0) ^ keys[rk + 1];
+    s2 = subbyte (SBOX, t2, t3, t0, t1) ^ keys[rk + 2];
+    s3 = subbyte (SBOX, t3, t0, t1, t2) ^ keys[rk + 3];
 
     pack32 (secret[ 0], secret[ 1], secret[ 2], secret[ 3], s0);
     pack32 (secret[ 4], secret[ 5], secret[ 6], secret[ 7], s1);
@@ -833,10 +500,10 @@ AES::decrypt (BLOCK const& secret, BLOCK& plain)
         }
     }
     int rk = nrounds << 2;
-    s0 = subbyte_last (IBOX, t0, t3, t2, t1) ^ ikeys[rk];
-    s1 = subbyte_last (IBOX, t1, t0, t3, t2) ^ ikeys[rk + 1];
-    s2 = subbyte_last (IBOX, t2, t1, t0, t3) ^ ikeys[rk + 2];
-    s3 = subbyte_last (IBOX, t3, t2, t1, t0) ^ ikeys[rk + 3];
+    s0 = subbyte (IBOX, t0, t3, t2, t1) ^ ikeys[rk];
+    s1 = subbyte (IBOX, t1, t0, t3, t2) ^ ikeys[rk + 1];
+    s2 = subbyte (IBOX, t2, t1, t0, t3) ^ ikeys[rk + 2];
+    s3 = subbyte (IBOX, t3, t2, t1, t0) ^ ikeys[rk + 3];
 
     pack32 (plain[ 0], plain[ 1], plain[ 2], plain[ 3], s0);
     pack32 (plain[ 4], plain[ 5], plain[ 6], plain[ 7], s1);
@@ -844,12 +511,12 @@ AES::decrypt (BLOCK const& secret, BLOCK& plain)
     pack32 (plain[12], plain[13], plain[14], plain[15], s3);
 }
 
-//  // generate SBOX, Te0..Te3, IBOX, Td0..Td3
+//  // generate SBOX, Te0, IBOX, Td0
 //  struct rijndael_table_generator {
 //      std::array<int,256> lntable;
 //      std::array<std::uint8_t,256> exptable;
-//      std::array<std::uint32_t,256> sbox, te0, te1, te2, te3;
-//      std::array<std::uint32_t,256> ibox, td0, td1, td2, td3;
+//      std::array<std::uint32_t,256> sbox, te0;
+//      std::array<std::uint32_t,256> ibox, td0;
 //
 //      void fill_table (void)
 //      {
@@ -864,15 +531,9 @@ AES::decrypt (BLOCK const& secret, BLOCK& plain)
 //  
 //              sbox[p] = unpack32 (s, s, s, s);
 //              te0[p] = unpack32 (mul (2, s), s, s, mul (3, s));
-//              te1[p] = unpack32 (mul (3, s), mul (2, s), s, s);
-//              te2[p] = unpack32 (s, mul (3, s), mul (2, s), s);
-//              te3[p] = unpack32 (s, s, mul (3, s), mul (2, s));
 //  
 //              ibox[s] = unpack32 (p, p, p, p);
 //              td0[s] = unpack32(mul (14, p), mul ( 9, p), mul (13, p), mul (11, p));
-//              td1[s] = unpack32(mul (11, p), mul (14, p), mul ( 9, p), mul (13, p));
-//              td2[s] = unpack32(mul (13, p), mul (11, p), mul (14, p), mul ( 9, p));
-//              td3[s] = unpack32(mul ( 9, p), mul (13, p), mul (11, p), mul (14, p));
 //          }
 //      }
 //

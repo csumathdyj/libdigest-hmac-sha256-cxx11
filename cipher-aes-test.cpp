@@ -38,7 +38,7 @@ test_key128 (test::simple& t)
         AES_BLOCK got_plain;
         aes.set_decrypt_key128 (key128);
         aes.decrypt (cipher, got_plain);
-        t.ok (plain == got_plain, "encrypt key128");
+        t.ok (plain == got_plain, "decrypt key128");
     }
 }
 
@@ -71,7 +71,7 @@ test_key192 (test::simple& t)
         AES_BLOCK got_plain;
         aes.set_decrypt_key192 (key192);
         aes.decrypt (cipher, got_plain);
-        t.ok (plain == got_plain, "encrypt key192");
+        t.ok (plain == got_plain, "decrypt key192");
     }
 }
 
@@ -105,7 +105,7 @@ test_key256 (test::simple& t)
         AES_BLOCK got_plain;
         aes.set_decrypt_key256 (key256);
         aes.decrypt (cipher, got_plain);
-        t.ok (plain == got_plain, "encrypt key256");
+        t.ok (plain == got_plain, "decrypt key256");
     }
 }
 
