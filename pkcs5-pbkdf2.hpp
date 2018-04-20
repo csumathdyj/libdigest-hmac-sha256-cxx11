@@ -31,7 +31,7 @@ pbkdf2 (std::string const& password, std::string const& salt, std::size_t const 
         key.append (t.begin (), t.begin () + n);
         keylen -= n;
     }
-    return std::move (key);
+    return key;
 }
 
 }//namespace pkcs5

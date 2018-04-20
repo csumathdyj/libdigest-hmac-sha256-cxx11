@@ -236,42 +236,49 @@ static const std::uint32_t Td0[256] = {
     0x4257b8d0UL,
 };
 
+// rotate byte left : octet_string(00112233) -> octet_string(11223300)
 static inline uint32_t
 rolbyte (std::uint32_t const a)
 {
-    return (a << 24) | (a >> 8);
+    return (a << 24) | (a >> 8); // reverse direction for little-endian
 }
 
+// rotate byte right : octet_string(00112233) -> octet_string(33001122)
 static inline std::uint32_t
 rorbyte (std::uint32_t const a)
 {
-    return (a << 8) | (a >> 24);
+    return (a << 8) | (a >> 24); // reverse direction for little-endian
 }
 
+// octet_string(00112233) == uint32_t(0x33221100) -> byte(00)
 static inline std::uint8_t
 byte0 (std::uint32_t const a)
 {
     return a & 0xff;
 }
 
+// octet_string(00112233) == uint32_t(0x33221100) -> byte(11)
 static inline std::uint8_t
 byte1 (std::uint32_t const a)
 {
     return (a >> 8) & 0xff;
 }
 
+// octet_string(00112233) == uint32_t(0x33221100) -> byte(22)
 static inline std::uint8_t
 byte2 (std::uint32_t const a)
 {
     return (a >> 16) & 0xff;
 }
 
+// octet_string(00112233) == uint32_t(0x33221100) -> byte(33)
 static inline std::uint8_t
 byte3 (std::uint32_t const a)
 {
     return (a >> 24) & 0xff;
 }
 
+// byte(00) byte(11) byte(22) byte(33) -> uint32_t(0x33221100)
 static inline std::uint32_t
 unpack32 (std::uint8_t const c0, std::uint8_t const c1,
           std::uint8_t const c2, std::uint8_t const c3)
@@ -282,6 +289,7 @@ unpack32 (std::uint8_t const c0, std::uint8_t const c1,
          | (static_cast<std::uint32_t> (c3) << 24);
 }
 
+// uint32_t(0x33221100) -> byte(00) byte(11) byte(22) byte(33)
 static inline void
 pack32 (std::uint8_t& c0, std::uint8_t& c1,
         std::uint8_t& c2, std::uint8_t& c3, std::uint32_t const a)
@@ -292,6 +300,7 @@ pack32 (std::uint8_t& c0, std::uint8_t& c1,
     c3 = byte3 (a);
 }
 
+// substitute each byte
 static inline uint32_t
 subbyte (std::uint32_t const box[],
     std::uint32_t const t0, std::uint32_t const t1, std::uint32_t const t2, std::uint32_t const t3)
@@ -302,12 +311,14 @@ subbyte (std::uint32_t const box[],
          ^ (box[byte3 (t3)] & 0xff000000UL);
 }
 
+// substitute each byte as uint32_t
 static inline uint32_t
 subbyte (std::uint32_t const box[], std::uint32_t const a)
 {
     return subbyte (box, a, a, a, a);
 }
 
+// snipet calulation of decrypt round keys from encrypt round keys
 static inline uint32_t
 inv_mix_column (std::uint32_t const a)
 {
@@ -317,6 +328,7 @@ inv_mix_column (std::uint32_t const a)
                     ^ rorbyte (Td0[SBOX[byte3 (a)] & 0xff])));
 }
 
+// encrypt one round: substitute byte -> mix column -> rotate byte
 static inline void
 enround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t& t3,
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
@@ -328,6 +340,7 @@ enround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     t3 = Te0[byte0 (s3)] ^ rorbyte (Te0[byte1 (s0)] ^ rorbyte (Te0[byte2 (s1)] ^ rorbyte (Te0[byte3 (s2)]))) ^ keys[3];
 }
 
+// decrypt one round, inverse of encrypt one round
 static inline void
 deround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t& t3,
     std::uint32_t const s0, std::uint32_t const s1, std::uint32_t const s2, std::uint32_t const s3,
@@ -339,6 +352,7 @@ deround (std::uint32_t& t0, std::uint32_t& t1, std::uint32_t& t2, std::uint32_t&
     t3 = Td0[byte0 (s3)] ^ rorbyte (Td0[byte1 (s2)] ^ rorbyte (Td0[byte2 (s1)] ^ rorbyte (Td0[byte3 (s0)]))) ^ ikeys[3];
 }
 
+// schedule encrypt round key from 128 bit key
 void
 AES::set_encrypt_key128 (std::array<std::uint8_t,16> const& key)
 {
@@ -348,6 +362,7 @@ AES::set_encrypt_key128 (std::array<std::uint8_t,16> const& key)
     schedule_encrypt_keys (NK, NR, keys);
 }
 
+// schedule encrypt round key from 192 bit key
 void
 AES::set_encrypt_key192 (std::array<std::uint8_t,24> const& key)
 {
@@ -357,6 +372,7 @@ AES::set_encrypt_key192 (std::array<std::uint8_t,24> const& key)
     schedule_encrypt_keys (NK, NR, keys);
 }
 
+// schedule encrypt round key from 256 bit key
 void
 AES::set_encrypt_key256 (std::array<std::uint8_t,32> const& key)
 {
@@ -366,6 +382,7 @@ AES::set_encrypt_key256 (std::array<std::uint8_t,32> const& key)
     schedule_encrypt_keys (NK, NR, keys);
 }
 
+// schedule decrypt round key from 128 bit key
 void
 AES::set_decrypt_key128 (std::array<std::uint8_t,16> const& key)
 {
@@ -375,6 +392,7 @@ AES::set_decrypt_key128 (std::array<std::uint8_t,16> const& key)
     schedule_decrypt_keys (NK, NR, ikeys);
 }
 
+// schedule encrypt round key from 192 bit key
 void
 AES::set_decrypt_key192 (std::array<std::uint8_t,24> const& key)
 {
@@ -384,6 +402,7 @@ AES::set_decrypt_key192 (std::array<std::uint8_t,24> const& key)
     schedule_decrypt_keys (NK, NR, ikeys);
 }
 
+// schedule encrypt round key from 256 bit key
 void
 AES::set_decrypt_key256 (std::array<std::uint8_t,32> const& key)
 {
@@ -393,6 +412,7 @@ AES::set_decrypt_key256 (std::array<std::uint8_t,32> const& key)
     schedule_decrypt_keys (NK, NR, ikeys);
 }
 
+// schedule encrypt round key for various bit size key
 void
 AES::schedule_encrypt_keys (int const nk, int const nr, std::uint32_t* rk)
 {
@@ -414,6 +434,7 @@ AES::schedule_encrypt_keys (int const nk, int const nr, std::uint32_t* rk)
     nrounds = nr;
 }
 
+// schedule decrypt round key for various bit size key
 void
 AES::schedule_decrypt_keys (int const nk, int const nr, std::uint32_t* rk)
 {
@@ -433,6 +454,7 @@ AES::schedule_decrypt_keys (int const nk, int const nr, std::uint32_t* rk)
     }
 }
 
+// encrypt one block
 void
 AES::encrypt (BLOCK const& plain, BLOCK& secret)
 {
@@ -472,6 +494,7 @@ AES::encrypt (BLOCK const& plain, BLOCK& secret)
     pack32 (secret[12], secret[13], secret[14], secret[15], s3);
 }
 
+// decrypt one block
 void
 AES::decrypt (BLOCK const& secret, BLOCK& plain)
 {
