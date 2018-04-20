@@ -91,8 +91,9 @@ encode_base32basic (std::string const& in, std::string const& b32,
         std::uint32_t const u3 = d > 3 ? static_cast<std::uint8_t> (s[3]) : 0;
         std::uint32_t const u4 = d > 4 ? static_cast<std::uint8_t> (s[4]) : 0;
         u = (u << 32) | (u1 << 24) | (u2 << 16) | (u3 << 8) | u4;
+        u <<= 24;
         for (int i = 0; i < n; ++i) {
-            u = (u << 5) | (u >> 35);
+            u = (u << 5) | (u >> 59);
             out.push_back (b32[u & 0x1f]);
         }
         if (padding && n < 8) {

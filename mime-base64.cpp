@@ -111,9 +111,9 @@ encode_base64basic (std::string const& in, std::string const& b64,
         std::uint32_t u = static_cast<std::uint8_t> (s[0]);
         std::uint32_t const u1 = d > 1 ? static_cast<std::uint8_t> (s[1]) : 0;
         std::uint32_t const u2 = d > 2 ? static_cast<std::uint8_t> (s[2]) : 0;
-        u = (u << 16) | (u1 << 8) | u2;
+        u = (u << 24) | (u1 << 16) | (u2 << 8);
         for (int i = 0; i < n; ++i) {
-            u = (u << 6) | (u >> 18);
+            u = (u << 6) | (u >> 26);
             out.push_back (b64[u & 0x3f]);
         }
         if (padding && n < 4) {
